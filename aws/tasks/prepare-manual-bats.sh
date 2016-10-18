@@ -7,42 +7,32 @@ set -e
 : ${AWS_ACCESS_KEY:?}
 : ${AWS_SECRET_KEY:?}
 : ${AWS_REGION_NAME:?}
-: ${AWS_STACK_NAME:?}
 : ${BAT_VCAP_PASSWORD:?}
 : ${BOSH_USER:?}
 : ${BOSH_PASSWORD:?}
 : ${PUBLIC_KEY_NAME:?}
 : ${STEMCELL_NAME:?}
 
-: ${AWS_ACCESS_KEY_ID:=${AWS_ACCESS_KEY}}
-: ${AWS_SECRET_ACCESS_KEY:=${AWS_SECRET_KEY}}
-: ${AWS_DEFAULT_REGION:=${AWS_REGION_NAME}}
-
-source pipelines/shared/utils.sh
-source pipelines/aws/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
-export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
-export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
-export AWS_DEFAULT_REGION=${AWS_REGION_NAME}
+metadata=$(cat environment/metadata)
 
 # configuration
-: ${SECURITY_GROUP:=$(         aws ec2 describe-security-groups --group-ids $(stack_info "SecurityGroupID") | jq -r '.SecurityGroups[] .GroupName' ) }
-: ${DIRECTOR_EIP:=$(           stack_info "DirectorEIP" )}
-: ${BATS_EIP:=$(               stack_info "DeploymentEIP" )}
-: ${SUBNET_ID:=$(              stack_info "PublicSubnetID" )}
-: ${AVAILABILITY_ZONE:=$(      stack_info "AvailabilityZone" )}
-: ${NETWORK_CIDR:=$(           stack_info "PublicCIDR" )}
-: ${NETWORK_GATEWAY:=$(        stack_info "PublicGateway" )}
-: ${NETWORK_RESERVED_RANGE:=$( stack_info "ReservedRange" )}
-: ${NETWORK_STATIC_RANGE:=$(   stack_info "StaticRange" )}
-: ${NETWORK_STATIC_IP_1:=$(    stack_info "StaticIP1" )}
-: ${NETWORK_STATIC_IP_2:=$(    stack_info "StaticIP2" )}
+: ${SECURITY_GROUP:=$(         echo ${metadata} | jq --raw-output ".SecurityGroupID" )}
+: ${DIRECTOR_EIP:=$(           echo ${metadata} | jq --raw-output ".DirectorEIP" )}
+: ${BATS_EIP:=$(               echo ${metadata} | jq --raw-output ".DeploymentEIP" )}
+: ${SUBNET_ID:=$(              echo ${metadata} | jq --raw-output ".PublicSubnetID" )}
+: ${AVAILABILITY_ZONE:=$(      echo ${metadata} | jq --raw-output ".AvailabilityZone" )}
+: ${NETWORK_CIDR:=$(           echo ${metadata} | jq --raw-output ".PublicCIDR" )}
+: ${NETWORK_GATEWAY:=$(        echo ${metadata} | jq --raw-output ".PublicGateway" )}
+: ${NETWORK_RESERVED_RANGE:=$( echo ${metadata} | jq --raw-output ".ReservedRange" )}
+: ${NETWORK_STATIC_RANGE:=$(   echo ${metadata} | jq --raw-output ".StaticRange" )}
+: ${NETWORK_STATIC_IP_1:=$(    echo ${metadata} | jq --raw-output ".StaticIP1" )}
+: ${NETWORK_STATIC_IP_2:=$(    echo ${metadata} | jq --raw-output ".StaticIP2" )}
 
 # inputs
 director_config=$(realpath director-config)
-bats_dir=$(realpath bats)
 
 # outputs
 output_dir=$(realpath bats-config)
@@ -68,12 +58,10 @@ export BAT_DIRECTOR_USER="${BOSH_USER}"
 export BAT_DIRECTOR_PASSWORD="${BOSH_PASSWORD}"
 EOF
 
-pushd "${bats_dir}" > /dev/null
-  ./write_gemfile
-  bundle install
-  bundle exec bosh -n target "${DIRECTOR_EIP}"
-  BOSH_UUID="$(bundle exec bosh status --uuid)"
-popd > /dev/null
+echo "using bosh CLI version..."
+bosh version
+bosh -n target ${DIRECTOR_EIP}
+BOSH_UUID="$(bosh status --uuid)"
 
 # BATs spec generation
 cat > "${bats_spec}" <<EOF
