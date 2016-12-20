@@ -9,6 +9,7 @@ inputs:
   - name: bosh-release
   - name: cpi-release
   - name: stemcell
+  - name: environment
 
 outputs:
   - name: director-config
@@ -20,7 +21,6 @@ params:
   AWS_ACCESS_KEY:         ""
   AWS_SECRET_KEY:         ""
   AWS_REGION_NAME:        ""
-  AWS_STACK_NAME:         ""
   BOSH_USER:              ""
   BOSH_PASSWORD:          ""
   PUBLIC_KEY_NAME:        ""
