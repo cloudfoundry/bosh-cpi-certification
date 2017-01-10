@@ -25,8 +25,8 @@ pushd ${input_dir} > /dev/null
   # configuration
   source director.env
   : ${BOSH_DIRECTOR_IP:?}
-  : ${BOSH_USER:?}
-  : ${BOSH_PASSWORD:?}
+  : ${BOSH_CLIENT:?}
+  : ${BOSH_CLIENT_SECRET:?}
 
   # Don't exit on failure to target the BOSH director
   set +e

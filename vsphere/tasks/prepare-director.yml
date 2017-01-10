@@ -18,8 +18,8 @@ run:
   path: pipelines/vsphere/tasks/prepare-director.sh
 
 params:
-  BOSH_USER:               ""
-  BOSH_PASSWORD:               ""
+  BOSH_CLIENT:             ""
+  BOSH_CLIENT_SECRET:          ""
   BOSH_VSPHERE_VCENTER:                 ""
   BOSH_VSPHERE_VCENTER_USER:            ""
   BOSH_VSPHERE_VCENTER_PASSWORD:        ""

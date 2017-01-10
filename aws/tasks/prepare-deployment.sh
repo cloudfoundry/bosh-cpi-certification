@@ -2,8 +2,8 @@
 
 set -e
 
-: ${BOSH_PASSWORD:?}
-: ${BOSH_USER:?}
+: ${BOSH_CLIENT_SECRET:?}
+: ${BOSH_CLIENT:?}
 : ${RELEASE_NAME:?}
 : ${STEMCELL_NAME:?}
 : ${DEPLOYMENT_NAME:?}

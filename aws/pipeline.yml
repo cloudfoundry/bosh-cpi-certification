@@ -17,8 +17,8 @@ shared:
     task: prepare-director
     file: pipelines/aws/tasks/prepare-director.yml
     params: &prepare-director-params
-      BOSH_USER:        {{BOSH_USER}}
-      BOSH_PASSWORD:    {{BOSH_PASSWORD}}
+      BOSH_CLIENT:      {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET:    {{BOSH_PASSWORD}}
       AWS_ACCESS_KEY:   {{AWS_ACCESS_KEY}}
       AWS_SECRET_KEY:   {{AWS_SECRET_KEY}}
       AWS_REGION_NAME:  {{AWS_REGION_NAME}}
@@ -31,8 +31,8 @@ shared:
     task: deploy-director
     file: pipelines/shared/tasks/deploy-director.yml
     params: &deploy-director-params
-      BOSH_USER: {{BOSH_USER}}
-      BOSH_PASSWORD: {{BOSH_PASSWORD}}
+      BOSH_CLIENT: {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET: {{BOSH_PASSWORD}}
 
   - &prepare-manual-bats
     task: prepare-manual-bats
@@ -43,8 +43,8 @@ shared:
       AWS_REGION_NAME:        {{AWS_REGION_NAME}}
       BAT_VCAP_PASSWORD:      {{BAT_VCAP_PASSWORD}}
       PUBLIC_KEY_NAME:        {{PUBLIC_KEY_NAME}}
-      BOSH_USER:              {{BOSH_USER}}
-      BOSH_PASSWORD:          {{BOSH_PASSWORD}}
+      BOSH_CLIENT:            {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET:     {{BOSH_CLIENT_SECRET}}
       STEMCELL_NAME:          ""
       AWS_STACK_NAME:         ""
 
@@ -59,8 +59,8 @@ shared:
       AWS_ACCESS_KEY:         {{AWS_ACCESS_KEY}}
       AWS_SECRET_KEY:         {{AWS_SECRET_KEY}}
       AWS_REGION_NAME:        {{AWS_REGION_NAME}}
-      BOSH_USER:              {{BOSH_USER}}
-      BOSH_PASSWORD:          {{BOSH_PASSWORD}}
+      BOSH_CLIENT:            {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET:     {{BOSH_CLIENT_SECRET}}
       AWS_STACK_NAME:         {{AWS_E2E_STACK_NAME}}
       STEMCELL_NAME:          ""
 
@@ -68,8 +68,8 @@ shared:
     task: teardown
     file: pipelines/shared/tasks/teardown.yml
     params: &teardown-params
-      BOSH_USER:              {{BOSH_USER}}
-      BOSH_PASSWORD:          {{BOSH_PASSWORD}}
+      BOSH_CLIENT:            {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET:     {{BOSH_CLIENT_SECRET}}
       DEPLOYMENT_NAME:        certification
 
 jobs:
@@ -244,8 +244,8 @@ jobs:
         - task: prepare-deployment
           file: pipelines/aws/tasks/prepare-deployment.yml
           params:
-            BOSH_USER:                 {{BOSH_USER}}
-            BOSH_PASSWORD:             {{BOSH_PASSWORD}}
+            BOSH_CLIENT:               {{BOSH_CLIENT}}
+            BOSH_CLIENT_SECRET:        {{BOSH_CLIENT_SECRET}}
             AWS_ACCESS_KEY:            {{AWS_ACCESS_KEY}}
             AWS_SECRET_KEY:            {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:           {{AWS_REGION_NAME}}
@@ -259,8 +259,8 @@ jobs:
           input_mapping:
             stemcell:                  old-stemcell
           params:
-            BOSH_USER:                 {{BOSH_USER}}
-            BOSH_PASSWORD:             {{BOSH_PASSWORD}}
+            BOSH_CLIENT:               {{BOSH_CLIENT}}
+            BOSH_CLIENT_SECRET:        {{BOSH_CLIENT_SECRET}}
             AWS_ACCESS_KEY:            {{AWS_ACCESS_KEY}}
             AWS_SECRET_KEY:            {{AWS_SECRET_KEY}}
             AWS_REGION_NAME:           {{AWS_REGION_NAME}}

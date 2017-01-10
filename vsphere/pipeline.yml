@@ -14,8 +14,8 @@ shared:
     tags: [vsphere-v5.1]
     file: pipelines/vsphere/tasks/prepare-director.yml
     params: &prepare-director-params
-      BOSH_USER:                            {{BOSH_USER}}
-      BOSH_PASSWORD:                        {{BOSH_PASSWORD}}
+      BOSH_CLIENT:                          {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET:                   {{BOSH_CLIENT_SECRET}}
       BOSH_VSPHERE_VCENTER:                 {{VCENTER_IP}}
       BOSH_VSPHERE_VCENTER_USER:            {{VCENTER_USER}}
       BOSH_VSPHERE_VCENTER_PASSWORD:        {{VCENTER_PASSWORD}}
@@ -40,8 +40,8 @@ shared:
     file: pipelines/vsphere/tasks/prepare-bats.yml
     params: &prepare-bats-params
       BAT_VCAP_PASSWORD:      {{BAT_VCAP_PASSWORD}}
-      BOSH_USER:              {{BOSH_USER}}
-      BOSH_PASSWORD:          {{BOSH_PASSWORD}}
+      BOSH_CLIENT:            {{BOSH_CLIENT}}
+      BOSH_CLIENT_SECRET:     {{BOSH_CLIENT_SECRET}}
 
   - &run-bats
     task: run-bats
@@ -160,8 +160,8 @@ jobs:
               RELEASE_NAME:              certification
               DEPLOYMENT_NAME:           certification
               STEMCELL_NAME:             bosh-vsphere-esxi-ubuntu-trusty-go_agent
-              BOSH_USER:                 {{BOSH_USER}}
-              BOSH_PASSWORD:             {{BOSH_PASSWORD}}
+              BOSH_CLIENT:               {{BOSH_CLIENT}}
+              BOSH_CLIENT_SECRET:        {{BOSH_CLIENT_SECRET}}
               BOSH_VSPHERE_VCENTER_VLAN: {{VCENTER_VLAN}}
 
           - task: create-deployment
@@ -170,8 +170,8 @@ jobs:
             input_mapping:
               stemcell:                  old-stemcell
             params:
-              BOSH_USER:                 {{BOSH_USER}}
-              BOSH_PASSWORD:             {{BOSH_PASSWORD}}
+              BOSH_CLIENT:               {{BOSH_CLIENT}}
+              BOSH_CLIENT_SECRET:        {{BOSH_CLIENT_SECRET}}
               RELEASE_NAME:              certification
               DEPLOYMENT_NAME:           certification
 

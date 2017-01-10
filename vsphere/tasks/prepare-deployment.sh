@@ -2,8 +2,8 @@
 
 set -e
 
-: ${BOSH_PASSWORD:?}
-: ${BOSH_USER:?}
+: ${BOSH_CLIENT_SECRET:?}
+: ${BOSH_CLIENT:?}
 : ${BOSH_VSPHERE_VCENTER_VLAN:?}
 : ${RELEASE_NAME:?}
 : ${STEMCELL_NAME:?}

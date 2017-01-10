@@ -3,8 +3,8 @@
 set -e
 
 # environment
-: ${BOSH_USER:?}
-: ${BOSH_PASSWORD:?}
+: ${BOSH_CLIENT:?}
+: ${BOSH_CLIENT_SECRET:?}
 : ${AWS_ACCESS_KEY:?}
 : ${AWS_SECRET_KEY:?}
 : ${AWS_REGION_NAME:?}
@@ -49,8 +49,8 @@ cat > "${output_dir}/director.env" <<EOF
 #!/usr/bin/env bash
 
 export BOSH_DIRECTOR_IP=${DIRECTOR_EIP}
-export BOSH_USER=${BOSH_USER}
-export BOSH_PASSWORD=${BOSH_PASSWORD}
+export BOSH_CLIENT=${BOSH_CLIENT}
+export BOSH_CLIENT_SECRET=${BOSH_PASSWORD}
 EOF
 
 manifest_filename="${output_dir}/director.yml"
@@ -136,9 +136,9 @@ jobs:
         address: ${DIRECTOR_STATIC_IP}
         host: ${DIRECTOR_STATIC_IP}
         db: *db
-        http: {user: ${BOSH_USER}, password: ${BOSH_PASSWORD}, port: 25777}
-        username: ${BOSH_USER}
-        password: ${BOSH_PASSWORD}
+        http: {user: ${BOSH_CLIENT}, password: ${BOSH_CLIENT_SECRET}, port: 25777}
+        username: ${BOSH_CLIENT}
+        password: ${BOSH_CLIENT_SECRET}
         port: 25777
 
       blobstore:
@@ -159,7 +159,7 @@ jobs:
           provider: local
           local:
             users:
-              - {name: ${BOSH_USER}, password: ${BOSH_PASSWORD}}
+              - {name: ${BOSH_CLIENT}, password: ${BOSH_CLIENT_SECRET}}
         ssl:
           key: "$(sed 's/$/\\n/g' <<< "${SSLIP_IO_KEY}" | tr -d '\n')"
           cert: |
@@ -264,7 +264,7 @@ jobs:
 
       hm:
         http: {user: hm, password: hm-password}
-        director_account: {user: ${BOSH_USER}, password: ${BOSH_PASSWORD}}
+        director_account: {user: ${BOSH_CLIENT}, password: ${BOSH_CLIENT_SECRET}}
 
       dns:
         recursor: 10.0.0.2

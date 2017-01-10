@@ -4,8 +4,8 @@ set -e
 
 : ${STEMCELL_NAME:?}
 : ${BAT_VCAP_PASSWORD:?}
-: ${BOSH_USER:?}
-: ${BOSH_PASSWORD:?}
+: ${BOSH_CLIENT:?}
+: ${BOSH_CLIENT_SECRET:?}
 
 source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
@@ -47,8 +47,8 @@ export BAT_INFRASTRUCTURE=vsphere
 export BAT_NETWORKING=manual
 export BAT_VCAP_PASSWORD=${BAT_VCAP_PASSWORD}
 export BAT_RSPEC_FLAGS="--tag ~vip_networking --tag ~dynamic_networking --tag ~root_partition --tag ~raw_ephemeral_storage"
-export BAT_DIRECTOR_USER="${BOSH_USER}"
-export BAT_DIRECTOR_PASSWORD="${BOSH_PASSWORD}"
+export BAT_DIRECTOR_USER="${BOSH_CLIENT}"
+export BAT_DIRECTOR_PASSWORD="${BOSH_CLIENT_SECRET}"
 EOF
 
 pushd "${bats_dir}" > /dev/null

@@ -15,7 +15,7 @@ ci_output_dir="${workspace_dir}/director-config"
 
 # environment
 : ${BOSH_CLIENT:?}
-: ${BOSH_CLIENT_SECRET:?}
+: ${BOSH_CLIENT_SECRET:   ?}
 : ${AWS_ACCESS_KEY:?}
 : ${AWS_SECRET_KEY:?}
 : ${AWS_REGION_NAME:?}

@@ -21,8 +21,8 @@ output_dir=$(realpath new-director-state/)
 
 source ${new_director_config}/director.env
 : ${BOSH_DIRECTOR_IP:?}
-: ${BOSH_USER:?}
-: ${BOSH_PASSWORD:?}
+: ${BOSH_CLIENT:?}
+: ${BOSH_CLIENT_SECRET:?}
 
 cp -r ${new_director_config}/* ${output_dir}
 cp -r ${old_director_state}/*-state.json ${output_dir}

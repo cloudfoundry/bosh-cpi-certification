@@ -15,7 +15,7 @@ run:
   path: pipelines/vsphere/tasks/create-deployment.sh
 
 params:
-  BOSH_PASSWORD: ""
-  BOSH_USER: ""
+  BOSH_CLIENT_SECRET: ""
+  BOSH_CLIENT: ""
   RELEASE_NAME:           ""
   DEPLOYMENT_NAME:        ""

@@ -7,8 +7,8 @@ source pipelines/aws/utils.sh
 : ${AWS_ACCESS_KEY:?}
 : ${AWS_SECRET_KEY:?}
 : ${AWS_REGION_NAME:?}
-: ${BOSH_USER:?}
-: ${BOSH_PASSWORD:?}
+: ${BOSH_CLIENT:?}
+: ${BOSH_CLIENT_SECRET:?}
 : ${AWS_STACK_NAME:?}
 : ${STEMCELL_NAME:?}
 

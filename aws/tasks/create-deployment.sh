@@ -5,8 +5,8 @@ set -e -x
 source pipelines/shared/utils.sh
 source pipelines/aws/utils.sh
 
-: ${BOSH_USER:?}
-: ${BOSH_PASSWORD:?}
+: ${BOSH_CLIENT:?}
+: ${BOSH_CLIENT_SECRET:?}
 : ${RELEASE_NAME:?}
 : ${DEPLOYMENT_NAME:?}
 : ${AWS_ACCESS_KEY:?}
