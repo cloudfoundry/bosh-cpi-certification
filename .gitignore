@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .DS_Store
 .idea
 .secrets
@@ -18,3 +19,8 @@ dev_releases
 releases/*.tgz
 releases/**/*.tgz
 tmp/
+=======
+*.json
+creds.yml
+tmp
+>>>>>>> upstream/master
