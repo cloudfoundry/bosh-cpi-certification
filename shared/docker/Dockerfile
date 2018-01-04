@@ -8,6 +8,7 @@ ENV LC_ALL en_US.UTF-8
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
+    curl \
     git \
     make \
     openssh-client \
@@ -15,7 +16,7 @@ RUN apt-get update && \
     wget && \
     apt-get clean
 
-ENV RUBY_INSTALL_VERSION=0.6.1 CHRUBY_VERSION=0.3.9 RUBY_VERSION=2.1.7 JQ_VERSION=1.5
+ENV RUBY_INSTALL_VERSION=0.6.1 CHRUBY_VERSION=0.3.9 RUBY_VERSION=2.4.4 JQ_VERSION=1.5
 
 # Import stedolan PGP key (jq)
 RUN wget -nv https://raw.githubusercontent.com/stedolan/jq/master/sig/jq-release.key && \

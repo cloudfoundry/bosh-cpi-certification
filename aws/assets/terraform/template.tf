@@ -16,7 +16,7 @@ data "aws_availability_zones" "available" {}
 resource "aws_vpc" "default" {
   assign_generated_ipv6_cidr_block = true
   cidr_block = "10.0.0.0/16"
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -24,7 +24,7 @@ resource "aws_vpc" "default" {
 # Create an internet gateway to give our subnet access to the outside world
 resource "aws_internet_gateway" "default" {
   vpc_id = "${aws_vpc.default.id}"
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -36,7 +36,7 @@ resource "aws_route_table" "default" {
     gateway_id = "${aws_internet_gateway.default.id}"
   }
 
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -49,15 +49,32 @@ resource "aws_route_table_association" "a" {
 resource "aws_subnet" "default" {
   vpc_id = "${aws_vpc.default.id}"
   cidr_block = "${cidrsubnet(aws_vpc.default.cidr_block, 8, 0)}"
-  ipv6_cidr_block = "${cidrsubnet(aws_vpc.default.ipv6_cidr_block, 8, 1)}"
+  ipv6_cidr_block = "${cidrsubnet(aws_vpc.default.ipv6_cidr_block, 8, 0)}"
   depends_on = ["aws_internet_gateway.default"]
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 
   map_public_ip_on_launch = true
+}
+
+resource "aws_route_table_association" "aws_resources" {
+  subnet_id = "${aws_subnet.aws_resources.id}"
+  route_table_id = "${aws_route_table.default.id}"
+}
+
+resource "aws_subnet" "aws_resources" {
+  vpc_id = "${aws_vpc.default.id}"
+  cidr_block = "${cidrsubnet(aws_vpc.default.cidr_block, 8, 1)}"
+  ipv6_cidr_block = "${cidrsubnet(aws_vpc.default.ipv6_cidr_block, 8, 1)}"
+  depends_on = ["aws_internet_gateway.default"]
+  availability_zone = "${data.aws_availability_zones.available.names[0]}"
+
+  tags = {
+    Name = "${var.env_name}-aws-resources"
+  }
 }
 
 resource "aws_network_acl" "allow_all" {
@@ -81,7 +98,7 @@ resource "aws_network_acl" "allow_all" {
     to_port = 0
   }
 
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -106,7 +123,7 @@ resource "aws_security_group" "allow_all" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -129,9 +146,9 @@ resource "aws_elb" "e2e" {
   }
 
   subnets = [
-    "${aws_subnet.default.id}"]
+    "${aws_subnet.aws_resources.id}"]
 
-  tags {
+  tags = {
     Name = "${var.env_name}-e2e"
   }
 }
@@ -218,7 +235,7 @@ output "default_key_name" {
   value = "${aws_key_pair.director.key_name}"
 }
 output "default_security_groups" {
-  value = ["${aws_security_group.allow_all.id}"]
+  value = ["${aws_security_group.allow_all.name}"]
 }
 output "external_ip" {
   value = "${aws_eip.director.public_ip}"

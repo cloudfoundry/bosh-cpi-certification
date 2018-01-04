@@ -4,6 +4,8 @@ groups:
     jobs:
       - bats-centos
       - bats-ubuntu
+      - test-stemcell-ipv4
+      - test-stemcell-ipv6
       - test-upgrade
       - certify-centos
       - certify-ubuntu
@@ -19,6 +21,21 @@ shared:
       OPTIONAL_OPS_FILE:  |
         -o bosh-deployment/vsphere/resource-pool.yml
         -o pipelines/shared/assets/ops/remove-hm.yml
+
+  - &prepare-director-ipv6
+    task: prepare-director-ipv6
+    tags: [vsphere-v6.5]
+    file: pipelines/shared/tasks/prepare-director.yml
+    params:
+      INFRASTRUCTURE:     vsphere
+      DIRECTOR_VARS_FILE: {{vsphere_director_vars_file}}
+      OPTIONAL_OPS_FILE:  |
+        -o bosh-deployment/vsphere/resource-pool.yml
+        -o pipelines/shared/assets/ops/remove-hm.yml
+        -o bosh-deployment/misc/ipv6/bosh.yml
+        -o pipelines/vsphere/assets/ipv6-director.yml
+        -o bosh-deployment/misc/second-network.yml
+        -o bosh-deployment/vsphere/second-network.yml
 
   - &deploy-director
     task: deploy-director
@@ -37,12 +54,94 @@ shared:
       BAT_NETWORKING:     manual
       BAT_RSPEC_FLAGS:    "--tag ~vip_networking --tag ~dynamic_networking --tag ~root_partition --tag ~raw_ephemeral_storage"
 
+  - &test-stemcell
+    task: test-stemcell
+    tags: [vsphere-v6.5]
+    file: pipelines/shared/tasks/test-stemcell.yml
+    params:
+      BOSH_os_name: ubuntu-trusty
+      package: ipv4director
+
+  - &update-cloud-config
+    task: update-cloud-config
+    tags: [vsphere-v6.5]
+    file: pipelines/shared/tasks/update-cloud-config.yml
+    params: &update-cloud-config-params
+      INFRASTRUCTURE: vsphere
+      DIRECTOR_VARS_FILE: {{vsphere_director_vars_file}}
+
   - &teardown
     task: teardown
     tags: [vsphere-v6.5]
     file: pipelines/shared/tasks/teardown.yml
 
 jobs:
+  - name: test-stemcell-ipv4
+    serial: true
+    plan:
+      - aggregate:
+        - {get: bosh-release,    tags: [vsphere-v6.5], trigger: true}
+        - {get: cpi-release,     tags: [vsphere-v6.5], trigger: true}
+        - {get: stemcell,        tags: [vsphere-v6.5], trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight,  tags: [vsphere-v6.5], trigger: true}
+        - {get: pipelines,       tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-cli,        tags: [vsphere-v6.5], trigger: false}
+        - {get: bats,            tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-deployment, tags: [vsphere-v6.5], trigger: false}
+        - {get: syslog-release,  tags: [vsphere-v6.5], trigger: false}
+        - {get: os-conf-release, tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-linux-stemcell-builder, tags: [vsphere-v6.5], trigger: false}
+      - do:
+        - {put: environment, tags: [vsphere-v6.5], params: {acquire: true}}
+        - <<: *prepare-director
+        - do:
+            - <<: *deploy-director
+            - <<: *update-cloud-config
+              params:
+                <<: *update-cloud-config-params
+                OPTIONAL_OPS_FILE: |
+                  -o pipelines/vsphere/assets/reserve-ips.yml
+            - <<: *test-stemcell
+          ensure:
+            do:
+              - <<: *teardown
+        ensure:
+          do:
+            - {put: environment, tags: [vsphere-v6.5], params: {release: environment}}
+
+  - name: test-stemcell-ipv6
+    serial: true
+    plan:
+      - aggregate:
+        - {get: bosh-release,    tags: [vsphere-v6.5], trigger: true}
+        - {get: cpi-release,     tags: [vsphere-v6.5], trigger: true}
+        - {get: stemcell,        tags: [vsphere-v6.5], trigger: true, resource: ubuntu-stemcell}
+        - {get: after-midnight,  tags: [vsphere-v6.5], trigger: true}
+        - {get: pipelines,       tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-cli,        tags: [vsphere-v6.5], trigger: false}
+        - {get: bats,            tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-deployment, tags: [vsphere-v6.5], trigger: false}
+        - {get: syslog-release,  tags: [vsphere-v6.5], trigger: false}
+        - {get: os-conf-release, tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-linux-stemcell-builder, tags: [vsphere-v6.5], trigger: false}
+      - do:
+        - {put: environment, tags: [vsphere-v6.5], params: {acquire: true}}
+        - <<: *prepare-director-ipv6
+        - do:
+            - <<: *deploy-director
+            - <<: *update-cloud-config
+              params:
+                <<: *update-cloud-config-params
+                OPTIONAL_OPS_FILE: |
+                  -o pipelines/vsphere/assets/ipv6-cc.yml
+            - <<: *test-stemcell
+          ensure:
+            do:
+              - <<: *teardown
+        ensure:
+          do:
+            - {put: environment, tags: [vsphere-v6.5], params: {release: environment}}
+
   - name: bats-centos
     serial: true
     plan:
@@ -117,7 +216,6 @@ jobs:
         params:
           <<: *prepare-director-params
           OPTIONAL_OPS_FILE: |
-            -o pipelines/shared/assets/ops/redis.yml
             -o bosh-deployment/vsphere/resource-pool.yml
             -o pipelines/shared/assets/ops/remove-provider-cert.yml
       - do:
@@ -126,6 +224,7 @@ jobs:
               stemcell:     old-stemcell
               bosh-release: old-bosh-release
               cpi-release:  old-cpi-release
+          - <<: *update-cloud-config
           - task: create-deployment
             tags: [vsphere-v6.5]
             file: pipelines/shared/tasks/create-deployment.yml
@@ -171,7 +270,7 @@ jobs:
       - aggregate:
         - {get: bosh-release, tags: [vsphere-v6.5], trigger: true, passed: [bats-ubuntu]}
         - {get: cpi-release,  tags: [vsphere-v6.5], trigger: true, passed: [bats-ubuntu]}
-        - {get: stemcell,     tags: [vsphere-v6.5], trigger: true, passed: [bats-ubuntu, test-upgrade], resource: ubuntu-stemcell}
+        - {get: stemcell,     tags: [vsphere-v6.5], trigger: true, passed: [bats-ubuntu, test-upgrade, test-stemcell-ipv4, test-stemcell-ipv6], resource: ubuntu-stemcell}
         - {get: pipelines,    tags: [vsphere-v6.5], trigger: false}
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
@@ -209,7 +308,7 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      branch: gocli-bats
+      branch: master
   - name: centos-stemcell
     type: bosh-io-stemcell
     source:
@@ -245,3 +344,16 @@ resources:
       uri: git@github.com:cloudfoundry/bosh-cpi-environments.git
       branch: master
       private_key: {{github_deployment_key__bosh-cpi-environments}}
+  - name: bosh-linux-stemcell-builder
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry/bosh-linux-stemcell-builder
+      branch: master
+  - name: syslog-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/syslog-release
+  - name: os-conf-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/os-conf-release

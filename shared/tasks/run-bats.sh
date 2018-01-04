@@ -10,11 +10,11 @@ set -e
 
 source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
-chruby 2.1.7
+chruby 2.4.4
 
 metadata="$( cat environment/metadata )"
 mkdir -p bats-config
-bosh2 int pipelines/${INFRASTRUCTURE}/assets/bats/bats-spec.yml \
+bosh int pipelines/${INFRASTRUCTURE}/assets/bats/bats-spec.yml \
   -v "stemcell_name=${STEMCELL_NAME}" \
   -l environment/metadata > bats-config/bats-config.yml
 
@@ -23,7 +23,7 @@ export BAT_PRIVATE_KEY="$( creds_path /jumpbox_ssh/private_key )"
 export BAT_DNS_HOST="${BOSH_ENVIRONMENT}"
 export BAT_STEMCELL=$(realpath stemcell/*.tgz)
 export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
-export BAT_BOSH_CLI=$(which bosh2)
+export BAT_BOSH_CLI=$(which bosh)
 
 ssh_key_path=/tmp/bat_private_key
 echo "$BAT_PRIVATE_KEY" > $ssh_key_path

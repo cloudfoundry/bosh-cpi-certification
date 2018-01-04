@@ -4,7 +4,7 @@ set -e
 
 source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
-chruby 2.1.7
+chruby 2.4.4
 
 : ${DEPLOYMENT_NAME:?}
 
@@ -36,10 +36,10 @@ trap finish EXIT
 
 echo "upgrading existing BOSH Director VM..."
 pushd ${output_dir} > /dev/null
-  time bosh2 create-env --state "${output_dir}/director-state.json" \
+  time bosh create-env --state "${output_dir}/director-state.json" \
     --vars-store "${output_dir}/creds.yml" -v director_name=bosh \
     director.yml
 popd > /dev/null
 
 echo "recreating existing BOSH Deployment..."
-time bosh2 -n -d ${DEPLOYMENT_NAME} recreate
+time bosh -n -d ${DEPLOYMENT_NAME} recreate

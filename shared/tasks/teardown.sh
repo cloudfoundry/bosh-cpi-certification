@@ -4,7 +4,7 @@ set -e
 
 source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
-chruby 2.1.7
+chruby 2.4.4
 
 if [ ! -e director-state/director-state.json ]; then
   echo "director-state.json does not exist, skipping..."
@@ -23,11 +23,11 @@ pushd director-state > /dev/null
 
     # teardown deployments against BOSH Director
     echo "deleting all deployments"
-    bosh2 deployments | awk '{print $1}' | xargs --no-run-if-empty -n 1 bosh2 -n delete-deployment --force -d
+    bosh deployments | awk '{print $1}' | xargs --no-run-if-empty -n 1 bosh -n delete-deployment --force -d
     echo "cleaning up bosh BOSH Director..."
-    time bosh2 -n clean-up --all
+    time bosh -n clean-up --all
   set -e
 
   echo "deleting existing BOSH Director VM..."
-  bosh2 -n delete-env --vars-store creds.yml -v director_name=bosh director.yml
+  bosh -n delete-env --vars-store creds.yml -v director_name=bosh director.yml
 popd

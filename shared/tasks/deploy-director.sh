@@ -6,7 +6,7 @@ set -e
 
 source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
-chruby 2.1.7
+chruby 2.4.4
 
 # inputs
 input_dir=$(realpath director-config/)
@@ -42,7 +42,7 @@ pushd ${output_dir} > /dev/null
   echo "deploying BOSH..."
 
   set +e
-  BOSH_LOG_PATH=$logfile bosh2 create-env \
+  BOSH_LOG_PATH=$logfile bosh create-env \
     --vars-store "${output_dir}/creds.yml" \
     director.yml
   bosh_cli_exit_code="$?"

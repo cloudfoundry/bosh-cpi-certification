@@ -1,0 +1,5 @@
+---
+- type: replace
+  path: /instance_groups/name=bosh/properties/director/cpi_api_test_max_version?
+  value: ((cpi_version))
+

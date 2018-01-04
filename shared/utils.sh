@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
-# Oportunistically configure bosh2 for use
+# Oportunistically configure bosh for use
 configure_bosh_cli() {
   local bosh_input="$(realpath bosh-cli/*bosh-cli-* 2>/dev/null || true)"
   if [[ -n "${bosh_input}" ]]; then
-    export bosh_cli="/usr/local/bin/bosh2"
+    export bosh_cli="/usr/local/bin/bosh"
     cp "${bosh_input}" "${bosh_cli}"
     chmod +x "${bosh_cli}"
   fi
 }
 configure_bosh_cli
 
-state_path() { bosh2 int director-state/director.yml --path="$1" ; }
-creds_path() { bosh2 int director-state/creds.yml --path="$1" ; }
+state_path() { bosh int director-state/director.yml --path="$1" ; }
+creds_path() { bosh int director-state/creds.yml --path="$1" ; }
 
 certify_artifacts() {
   local usage="Usage: certify_artifacts BOSH_RELEASE_NAME BOSH_RELEASE_VERSION CPI_RELEASE_NAME CPI_RELEASE_VERSION STEMCELL_NAME STEMCELL_VERSION"

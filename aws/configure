@@ -1,4 +1,3 @@
 fly -t cpi sp -p certify-aws \
   -c $AWS_DIR/pipeline.yml \
   -l <(lpass show --note "certify aws cpi secrets") \
-  -v old_bosh_release_version=$OLD_BOSH_RELEASE_VERSION

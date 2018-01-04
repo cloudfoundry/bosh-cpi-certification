@@ -1,0 +1,7 @@
+set -e
+  lpass status
+set +e
+
+fly -t cpi sp -p certify-gcp \
+  -c $GCP_DIR/pipeline.yml \
+  -l <(lpass show --note 'certify gcp cpi secrets') \

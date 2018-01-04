@@ -1,0 +1,306 @@
+---
+groups:
+  - name: certify-alicloud
+    jobs:
+      - bats-ubuntu-xenial
+      - test-stemcell-ubuntu-xenial
+#      - test-upgrade
+      - certify-ubuntu-xenial
+
+shared:
+  - &prepare-director
+    task: prepare-director
+    file: pipelines/shared/tasks/prepare-director.yml
+    params: &prepare-director-params
+      INFRASTRUCTURE:     alicloud
+      DIRECTOR_VARS_FILE: {{alicloud_director_vars_file}}
+      OPTIONAL_OPS_FILE: |
+        -o bosh-deployment/external-ip-with-registry-not-recommended.yml
+        -o pipelines/shared/assets/ops/remove-provider-cert.yml
+    on_failure:
+      put: notify
+      params:
+        text: "[bosh-cpi-certification Failed]\nRunning the task prepare-director failed. Please check it."
+
+  - &deploy-director
+    task: deploy-director
+    file: pipelines/shared/tasks/deploy-director.yml
+    on_failure:
+      put: notify
+      params:
+        text: "[bosh-cpi-certification Failed]\nRunning the task deploy-director failed. Please check it."
+
+  - &run-bats
+    task: run-bats
+    file: pipelines/shared/tasks/run-bats.yml
+    params: &run-bats-params
+      INFRASTRUCTURE:     alicloud
+      BAT_INFRASTRUCTURE: alicloud
+      BAT_NETWORKING:     manual
+      BAT_RSPEC_FLAGS:    "--tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~persistent_disk"
+    on_failure:
+      put: notify
+      params:
+        text: "[bosh-cpi-certification Failed]\nRunning the task run-bats failed. Please check it."
+
+  - &test-stemcell-ubuntu-xenial
+    task: test-stemcell-ubuntu-xenial
+    file: pipelines/shared/tasks/test-stemcell.yml
+    params:
+      BOSH_os_name: ubuntu-xenial
+      package: ipv4director
+    on_failure:
+      put: notify
+      params:
+        text: "[bosh-cpi-certification Failed]\nRunning task test-stemcell-ubuntu-xenial failed. Please check it."
+
+  - &update-cloud-config
+    task: update-cloud-config
+    file: pipelines/shared/tasks/update-cloud-config.yml
+    params: &update-cloud-config-params
+      INFRASTRUCTURE: alicloud
+      DIRECTOR_VARS_FILE: {{alicloud_director_vars_file}}
+    on_failure:
+      put: notify
+      params:
+        text: "[bosh-cpi-certification Failed]\nRunning task update-cloud-config failed. Please check it."
+
+  - &teardown
+    task: teardown
+    file: pipelines/shared/tasks/teardown.yml
+
+  - &put-environment
+    task: put-environment
+    file: pipelines/alicloud/tasks/put-environment.yml
+    params: &put-environment-params
+      access_key: {{alicloud_access_key__primary}}
+      secret_key: {{alicloud_secret_key__primary}}
+      region:     {{alicloud_region__primary}}
+      remote_state_access_key: {{terraform_backend_access_key}}
+      remote_state_secret_key: {{terraform_backend_secret_key}}
+      remote_state_bucket:     {{terraform_backend_bucket}}
+      remote_state_region:     {{terraform_backend_region}}
+      remote_state_file_path:  "bosh-cpi-certification"
+      public_key: ((PUBLIC_KEY))
+      terraform_source: bosh-cpi-src/ci/assets/terraform
+    on_failure:
+      put: notify
+      params:
+        text: "[bosh-cpi-certification Failed]\nRunning task put-environment failed. Please check it."
+
+jobs:
+  - name: test-stemcell-ubuntu-xenial
+    serial: true
+    plan:
+      - aggregate:
+        - {get: bosh-release,                trigger: true}
+        - {get: cpi-release,                 trigger: true}
+        - {get: stemcell,                    trigger: true, resource: ubuntu-xenial-stemcell}
+        - {get: after-midnight,              trigger: true}
+        - {get: pipelines,                   trigger: false}
+        - {get: bosh-cli,                    trigger: false}
+        - {get: bats,                        trigger: false}
+        - {get: bosh-deployment,             trigger: false}
+        - {get: syslog-release,              trigger: false}
+        - {get: os-conf-release,             trigger: false}
+        - {get: bosh-linux-stemcell-builder, trigger: false}
+      - <<: *put-environment
+        params:
+          <<: *put-environment-params
+          env_name: alicloud-test-stemcell-ubuntu-xenial
+          delete_on_failure: true
+          terraform_source: pipelines/alicloud/assets/terraform
+      - do:
+        - <<: *prepare-director
+          params:
+            <<: *prepare-director-params
+            OPTIONAL_OPS_FILE: |
+              -o pipelines/shared/assets/ops/remove-hm.yml
+              -o bosh-deployment/external-ip-with-registry-not-recommended.yml
+              -o pipelines/shared/assets/ops/remove-provider-cert.yml
+        - do:
+          - <<: *deploy-director
+          - <<: *update-cloud-config
+          - <<: *test-stemcell-ubuntu-xenial
+          ensure:
+            do:
+              - <<: *teardown
+        ensure:
+          do:
+            - <<: *put-environment
+              params:
+                <<: *put-environment-params
+                env_name: certify-alicloud-test-stemcell-ubuntu-xenial
+                action: destroy
+                terraform_source: pipelines/alicloud/assets/terraform
+
+  - name: bats-ubuntu-xenial
+    serial: true
+    plan:
+      - aggregate:
+        - {get: bosh-release,    trigger: true}
+        - {get: cpi-release,     trigger: true}
+        - {get: after-midnight,  trigger: true}
+        - {get: pipelines,       trigger: false}
+        - {get: bosh-cli,        trigger: false}
+        - {get: bats,            trigger: false}
+        - {get: bosh-deployment, trigger: false}
+        - get: stemcell
+          resource: ubuntu-xenial-stemcell
+          trigger: false
+          params:
+            preserve_filename: true
+      - <<: *put-environment
+        params:
+          <<: *put-environment-params
+          env_name: certify-alicloud-bats-ubuntu-xenial
+          delete_on_failure: true
+          terraform_source: pipelines/alicloud/assets/terraform
+      - do:
+        - <<: *prepare-director
+          params:
+            <<: *prepare-director-params
+            OPTIONAL_OPS_FILE:  |
+              -o pipelines/shared/assets/ops/remove-hm.yml
+              -o bosh-deployment/external-ip-with-registry-not-recommended.yml
+              -o pipelines/shared/assets/ops/remove-provider-cert.yml
+        - do:
+          - <<: *deploy-director
+          - <<: *run-bats
+            params:
+              <<: *run-bats-params
+              STEMCELL_NAME: bosh-alicloud-kvm-ubuntu-xenial-go_agent
+          ensure:
+            do:
+              - <<: *teardown
+        ensure:
+          do:
+            - <<: *put-environment
+              params:
+                <<: *put-environment-params
+                env_name: certify-alicloud-bats-ubuntu-xenial
+                action: destroy
+                terraform_source: pipelines/alicloud/assets/terraform
+
+  - name: certify-ubuntu-xenial
+    serial: true
+    plan:
+      - aggregate:
+        - {get: bosh-release, trigger: true, passed: [bats-ubuntu-xenial]}
+        - {get: cpi-release,  trigger: true, passed: [bats-ubuntu-xenial]}
+        - {get: stemcell,     trigger: true, passed: [bats-ubuntu-xenial, test-stemcell-ubuntu-xenial], resource: ubuntu-xenial-stemcell}
+        - {get: pipelines,    trigger: false}
+      - task: generate
+        file: pipelines/shared/tasks/generate-receipt.yml
+        params:
+          CPI_RELEASE_NAME: bosh-alicloud-cpi
+          STEMCELL_NAME:    bosh-alicloud-kvm-ubuntu-xenial-go_agent
+        on_success:
+          put: notify
+          params:
+            text: "[bosh-cpi-certification Success]\nRunning task certify-ubuntu-xenial success."
+        on_failure:
+          put: notify
+          params:
+            text: "[bosh-cpi-certification Failed]\nRunning task certify-ubuntu-xenial failed. Please check it."
+      - {put: receipt, params: {file: certification/*-receipt.json}}
+
+resource_types:
+  - name: terraform_type
+    type: docker-image
+    source:
+      repository: ljfranklin/terraform-resource
+
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+
+resources:
+  - name: after-midnight
+    type: time
+    source:
+      start: 00:00 AM
+      stop: 11:00 PM
+      location: {{time_location}}
+#  - name: bosh-cpi-src-in
+#    type: git
+#    source:
+#      uri: https://github.com/xiaozhu36/bosh-alicloud-cpi-release.git
+#      branch: master
+#      paths:
+#        - ci/**
+  - name: pipelines
+    type: git
+    source:
+      uri: https://github.com/aliyun/bosh-cpi-certification
+      branch: xiaozhu
+  - name: bosh-deployment
+    type: git
+    source:
+      uri: https://github.com/aliyun/bosh-deployment
+      branch: dev
+#  - name: cpi-release
+#    type: bosh-io-release
+#    source:
+#      repository: cloudfoundry-incubator/bosh-alicloud-cpi-release
+  - name: cpi-release
+    type: github-release
+    source:
+      owner: cloudfoundry-incubator
+      repository: bosh-alicloud-cpi-release
+      insecure: true
+      tag_filter: "v(.*)"
+  - name: bosh-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/bosh
+  - name: bats
+    type: git
+    source:
+      uri: https://github.com/aliyun/bosh-acceptance-tests.git
+      branch: alicloud
+  - name: ubuntu-xenial-stemcell
+    type: bosh-io-stemcell
+    source:
+      name: &ubuntu-xenial-stemcell bosh-alicloud-kvm-ubuntu-xenial-go_agent
+#  - name: ubuntu-xenial-stemcell
+#    type: github-release
+#    source:
+#      owner: aliyun
+#      repository: bosh-linux-stemcell-builder
+  - name: bosh-cli
+    type: s3
+    source:
+      regexp: bosh-cli-([0-9.]+)-linux-amd64
+      cloudfront_url: https://dulfnruy35dwq.cloudfront.net
+      bucket: bosh-cli-artifacts
+      region_name: us-east-1
+  - name: receipt
+    type: s3
+    source:
+      access_key_id: {{certification__bucket_access_key}}
+      secret_access_key: {{certification__bucket_secret_key}}
+      bucket: {{certification__bucket}}
+      regexp: .*-(\d+)-receipt\.json
+      region_name: {{certification__bucket_region}}
+      endpoint: oss-((certification__bucket_region)).aliyuncs.com
+  - name: bosh-linux-stemcell-builder
+    type: git
+    source:
+      uri: https://github.com/aliyun/bosh-linux-stemcell-builder
+#      aliyun-xenial branch modifyed the bosh-linux-stemcell-builder/src/github.com/cloudfoundry/stemcell-acceptance-tests/ipv4director/smoke/smoke_test.go:92
+      branch: aliyun-xenial
+  - name: syslog-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/syslog-release
+  - name: os-conf-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/os-conf-release
+
+  - name: notify
+    type: slack-notification
+    source:
+      url: ((slack-webhook))

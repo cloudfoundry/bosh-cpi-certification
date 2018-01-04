@@ -107,12 +107,16 @@ output "internal_gw" {
 output "reserved_range" {
   value = "${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 2)}-${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 15)}"
 }
+output "static_range" {
+  value = "${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 16)}-${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 30)}"
+}
+
 output "bats_external_ip" {
   value = "${google_compute_address.bats.address}"
 }
 output "bats_static_ip_pair" {
-  value = ["${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 13)}","${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 14)}"]
+  value = ["${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 17)}","${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 18)}"]
 }
 output "bats_static_ip" {
-  value = "${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 7)}"
+  value = "${cidrhost(google_compute_subnetwork.subnetwork.ip_cidr_range, 16)}"
 }
