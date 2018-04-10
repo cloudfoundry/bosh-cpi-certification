@@ -54,6 +54,13 @@ shared:
       BOSH_os_name: ubuntu-trusty
       package: ipv4director
 
+  - &test-stemcell-xenial
+    task: test-stemcell
+    file: pipelines/shared/tasks/test-stemcell.yml
+    params:
+      BOSH_os_name: ubuntu-xenial
+      package: ipv4director
+
   - &update-cloud-config
     task: update-cloud-config
     file: pipelines/shared/tasks/update-cloud-config.yml
@@ -155,7 +162,7 @@ jobs:
             input_mapping:
               stemcell: ubuntu-stemcell
           - <<: *update-cloud-config
-          - <<: *test-stemcell
+          - <<: *test-stemcell-xenial
           ensure:
             do:
               - <<: *teardown
@@ -317,7 +324,7 @@ jobs:
           - <<: *run-bats
             params:
               <<: *run-bats-params
-              STEMCELL_NAME: *ubuntu-stemcell
+              STEMCELL_NAME: *xenial-stemcell
           ensure:
             do:
               - <<: *teardown
