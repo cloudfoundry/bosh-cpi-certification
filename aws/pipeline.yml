@@ -482,7 +482,7 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      branch: gocli-bats
+      branch: master
   - name: ubuntu-stemcell
     type: bosh-io-stemcell
     source:
