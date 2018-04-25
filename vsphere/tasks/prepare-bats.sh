@@ -52,7 +52,6 @@ export BAT_DIRECTOR_PASSWORD="${BOSH_CLIENT_SECRET}"
 EOF
 
 pushd "${bats_dir}" > /dev/null
-  ./write_gemfile
   bundle install
   bundle exec bosh -n target "${director_ip}"
   BOSH_UUID="$(bundle exec bosh status --uuid)"
