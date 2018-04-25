@@ -41,7 +41,6 @@ if [ -n "${BAT_VCAP_PRIVATE_KEY}" ]; then
 fi
 
 pushd $bats_dir
-  ./write_gemfile
   bundle install
   bundle exec rspec spec ${BAT_RSPEC_FLAGS}
 popd
