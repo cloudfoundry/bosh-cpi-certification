@@ -10,6 +10,7 @@ source pipelines/shared/utils.sh
 : ${BOSH_VSPHERE_VERSION:?}
 : ${BOSH_VSPHERE_VCENTER_DC:?}
 : ${BOSH_VSPHERE_VCENTER_CLUSTER:?}
+: ${BOSH_VSPHERE_VCENTER_RP:?}
 : ${BOSH_VSPHERE_VCENTER_VM_FOLDER:?}
 : ${BOSH_VSPHERE_VCENTER_TEMPLATE_FOLDER:?}
 : ${BOSH_VSPHERE_VCENTER_DATASTORE:?}
@@ -269,7 +270,9 @@ jobs:
             datastore_pattern: ${BOSH_VSPHERE_VCENTER_DATASTORE}
             persistent_datastore_pattern: ${BOSH_VSPHERE_VCENTER_DATASTORE}
             disk_path: ${BOSH_VSPHERE_VCENTER_DISK_PATH}
-            clusters: [${BOSH_VSPHERE_VCENTER_CLUSTER}]
+            clusters:
+            - ${BOSH_VSPHERE_VCENTER_CLUSTER}:
+                resource_pool: ${BOSH_VSPHERE_VCENTER_RP}
 
 cloud_provider:
   template: {name: vsphere_cpi, release: bosh-vsphere-cpi}
