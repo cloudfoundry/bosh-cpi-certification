@@ -137,7 +137,6 @@ jobs:
         - {get: bosh-release,                trigger: true}
         - {get: cpi-release,                 trigger: true}
         - {get: stemcell,                    trigger: true, resource: ubuntu-xenial-stemcell}
-        - {get: ubuntu-trusty-stemcell,      trigger: true, resource: ubuntu-trusty-stemcell}
         - {get: after-midnight,              trigger: true}
         - {get: pipelines,                   trigger: false}
         - {get: bosh-cli,                    trigger: false}
@@ -149,8 +148,6 @@ jobs:
       - <<: *create-environment
       - do:
         - <<: *prepare-director
-          input_mapping:
-            stemcell: ubuntu-trusty-stemcell
           params:
             <<: *prepare-director-params
             OPTIONAL_OPS_FILE: |
@@ -159,8 +156,6 @@ jobs:
               -o pipelines/shared/assets/ops/remove-provider-cert.yml
         - do:
           - <<: *deploy-director
-            input_mapping:
-              stemcell: ubuntu-trusty-stemcell
           - <<: *update-cloud-config
           - <<: *test-stemcell-ubuntu-xenial
           ensure:
@@ -303,14 +298,9 @@ jobs:
           trigger: true
           params:
             preserve_filename: true
-        - get: ubuntu-trusty-stemcell
-          params:
-            preserve_filename: true
       - <<: *create-environment
       - do:
         - <<: *prepare-director
-          input_mapping:
-            stemcell: ubuntu-trusty-stemcell
           params:
             <<: *prepare-director-params
             OPTIONAL_OPS_FILE:  |
@@ -319,8 +309,6 @@ jobs:
               -o pipelines/shared/assets/ops/remove-provider-cert.yml
         - do:
           - <<: *deploy-director
-            input_mapping:
-              stemcell: ubuntu-trusty-stemcell
           - <<: *run-bats
             params:
               <<: *run-bats-params
