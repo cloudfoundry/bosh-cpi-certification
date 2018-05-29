@@ -2,12 +2,12 @@
 groups:
   - name: certify-gcp
     jobs:
-      - bats-centos
-      - bats-ubuntu
-      - test-stemcell
+      - bats-centos-7
+      - bats-ubuntu-trusty
+      - test-stemcell-ubuntu-trusty
       - test-upgrade
-      - certify-centos
-      - certify-ubuntu
+      - certify-centos-7
+      - certify-ubuntu-trusty
 
 shared:
   - &prepare-director
@@ -31,8 +31,8 @@ shared:
       BAT_INFRASTRUCTURE: gcp
       BAT_NETWORKING:     dynamic
 
-  - &test-stemcell
-    task: test-stemcell
+  - &test-stemcell-ubuntu-trusty
+    task: test-stemcell-ubuntu-trusty
     file: pipelines/shared/tasks/test-stemcell.yml
     params:
       BOSH_os_name: ubuntu-trusty
@@ -66,13 +66,13 @@ shared:
       action: destroy
 
 jobs:
-  - name: test-stemcell
+  - name: test-stemcell-ubuntu-trusty
     serial: true
     plan:
       - aggregate:
         - {get: bosh-release,    trigger: true}
         - {get: cpi-release,     trigger: true}
-        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
+        - {get: stemcell,        trigger: true, resource: ubuntu-trusty-stemcell}
         - {get: after-midnight,  trigger: true}
         - {get: pipelines,       trigger: false}
         - {get: bosh-cli,        trigger: false}
@@ -89,7 +89,7 @@ jobs:
         - do:
           - <<: *deploy-director
           - <<: *update-cloud-config
-          - <<: *test-stemcell
+          - <<: *test-stemcell-ubuntu-trusty
           ensure:
             do:
               - <<: *teardown
@@ -97,13 +97,13 @@ jobs:
           do:
             - <<: *destroy-environment
 
-  - name: bats-centos
+  - name: bats-centos-7
     serial: true
     plan:
       - aggregate:
         - {get: bosh-release,    trigger: true}
         - {get: cpi-release,     trigger: true}
-        - {get: stemcell,        trigger: true, resource: centos-stemcell}
+        - {get: stemcell,        trigger: true, resource: centos-7-stemcell}
         - {get: after-midnight,  trigger: true}
         - {get: pipelines,       trigger: false}
         - {get: bosh-cli,        trigger: false}
@@ -123,13 +123,13 @@ jobs:
             - <<: *teardown
             - <<: *destroy-environment
 
-  - name: bats-ubuntu
+  - name: bats-ubuntu-trusty
     serial: true
     plan:
       - aggregate:
         - {get: bosh-release,    trigger: true}
         - {get: cpi-release,     trigger: true}
-        - {get: stemcell,        trigger: true, resource: ubuntu-stemcell}
+        - {get: stemcell,        trigger: true, resource: ubuntu-trusty-stemcell}
         - {get: after-midnight,  trigger: true}
         - {get: pipelines,       trigger: false}
         - {get: bosh-cli,        trigger: false}
@@ -155,11 +155,11 @@ jobs:
       - aggregate:
         - {get: bosh-release,     trigger: true}
         - {get: cpi-release,      trigger: true}
-        - {get: stemcell,         trigger: true, resource: ubuntu-stemcell}
+        - {get: stemcell,         trigger: true, resource: ubuntu-trusty-stemcell}
         - {get: after-midnight,   trigger: true}
         - {get: pipelines,        trigger: false}
         - {get: bosh-cli,         trigger: false}
-        - {get: centos-stemcell,  trigger: false} # pass-through
+        - {get: centos-7-stemcell,  trigger: false} # pass-through
         - {get: old-stemcell,     trigger: false, version: {version: "3363"}}
         - {get: old-bosh-release, trigger: false, version: {version: {{old_bosh_release_version}}}, resource: bosh-release}
         - {get: old-cpi-release,  trigger: false, version: {version: "25.6.2"},  resource: cpi-release}
@@ -203,13 +203,13 @@ jobs:
             - <<: *teardown
             - <<: *destroy-environment
 
-  - name: certify-centos
+  - name: certify-centos-7
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release, trigger: true, passed: [bats-centos]}
-        - {get: cpi-release,  trigger: true, passed: [bats-centos]}
-        - {get: stemcell,     trigger: true, passed: [bats-centos, test-upgrade], resource: centos-stemcell}
+        - {get: bosh-release, trigger: true, passed: [bats-centos-7]}
+        - {get: cpi-release,  trigger: true, passed: [bats-centos-7]}
+        - {get: stemcell,     trigger: true, passed: [bats-centos-7, test-upgrade], resource: centos-7-stemcell}
         - {get: pipelines,    trigger: false}
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
@@ -218,13 +218,13 @@ jobs:
           STEMCELL_NAME:    bosh-google-kvm-centos-7-go_agent
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
-  - name: certify-ubuntu
+  - name: certify-ubuntu-trusty
     serial: true
     plan:
       - aggregate:
-        - {get: bosh-release, trigger: true, passed: [bats-ubuntu]}
-        - {get: cpi-release,  trigger: true, passed: [bats-ubuntu]}
-        - {get: stemcell,     trigger: true, passed: [bats-ubuntu, test-upgrade, test-stemcell], resource: ubuntu-stemcell}
+        - {get: bosh-release, trigger: true, passed: [bats-ubuntu-trusty]}
+        - {get: cpi-release,  trigger: true, passed: [bats-ubuntu-trusty]}
+        - {get: stemcell,     trigger: true, passed: [bats-ubuntu-trusty, test-upgrade, test-stemcell-ubuntu-trusty], resource: ubuntu-trusty-stemcell}
         - {get: pipelines,    trigger: false}
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
@@ -284,7 +284,7 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry-incubator/bosh-google-cpi-release
-  - name: ubuntu-stemcell
+  - name: ubuntu-trusty-stemcell
     type: bosh-io-stemcell
     source:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
@@ -292,7 +292,7 @@ resources:
     type: bosh-io-stemcell
     source:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
-  - name: centos-stemcell
+  - name: centos-7-stemcell
     type: bosh-io-stemcell
     source:
       name: bosh-google-kvm-centos-7-go_agent
