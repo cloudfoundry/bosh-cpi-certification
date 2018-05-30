@@ -15,7 +15,7 @@ tests. This is meant to complement the existing tests, not to replace.
       1. Once a day.
 * How are we testing?
   - Testing for certification consists of the following test scenarios:
-    1. [BATs](https://github.com/cloudfoundry/bosh-acceptance-tests/tree/gocli-bats) are run for every flavor of stemcells (ubuntu-trusty and centos-7)
+    1. [BATs](https://github.com/cloudfoundry/bosh-acceptance-tests/tree/master) are run for every flavor of stemcells (ubuntu-trusty and centos-7)
     1. A BOSH director upgrade test is run from a previous version family stemcell (e.g. 3363.x to 3421.latest)
     1. Specific IaaS end-2-end tests, if necessary
 
@@ -49,7 +49,7 @@ The folder structure looks like this:
     └── pipeline.yml
 ```
 
-`iaas/bats/bats-spec.yml`: Manifest with all IaaS-specific configurations for BATs. Make a PR to add the IaaS-specific template to the [BATs template folder](https://github.com/cloudfoundry/bosh-acceptance-tests/tree/gocli-bats/templates).
+`iaas/bats/bats-spec.yml`: Manifest with all IaaS-specific configurations for BATs. Make a PR to add the IaaS-specific template to the [BATs template folder](https://github.com/cloudfoundry/bosh-acceptance-tests/tree/master/templates).
 
 `iaas/certification/cloud-config-ops.yml`: Ops file to add IaaS-specific properties to the [certification cloud-config](https://github.com/cloudfoundry-incubator/bosh-cpi-certification/blob/46152f8d50562c39cb70d0f442920c7b78a0c752/shared/assets/certification-release/cloud-config.yml)
 
