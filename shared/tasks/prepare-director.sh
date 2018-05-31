@@ -18,6 +18,7 @@ bosh int \
   -v cpi_release_uri="file://$(echo cpi-release/*.tgz)" \
   -v stemcell_uri="file://$(echo stemcell/*.tgz)" \
   -v director_name=bosh \
+  -v cpi_version=${CPI_VERSION}
   -l <( echo "${DIRECTOR_VARS_FILE}" ) \
   -l <( pipelines/${INFRASTRUCTURE}/assets/director-vars ) \
   bosh-deployment/bosh.yml > director-config/director.yml
