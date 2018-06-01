@@ -7,8 +7,8 @@ set -e
 
 source pipelines/shared/utils.sh
 
-bosh int \
-  -o bosh-deployment/${INFRASTRUCTURE}/cpi.yml \
+bosh int -o \
+  bosh-deployment/${INFRASTRUCTURE}/cpi.yml \
   -o bosh-deployment/misc/powerdns.yml \
   -o bosh-deployment/jumpbox-user.yml \
   -o pipelines/shared/assets/ops/custom-releases.yml \
@@ -18,7 +18,7 @@ bosh int \
   -v cpi_release_uri="file://$(echo cpi-release/*.tgz)" \
   -v stemcell_uri="file://$(echo stemcell/*.tgz)" \
   -v director_name=bosh \
-  -v cpi_version=${CPI_VERSION}
+  -v cpi_version=${CPI_VERSION} \
   -l <( echo "${DIRECTOR_VARS_FILE}" ) \
   -l <( pipelines/${INFRASTRUCTURE}/assets/director-vars ) \
   bosh-deployment/bosh.yml > director-config/director.yml
