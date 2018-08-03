@@ -59,22 +59,6 @@ shared:
     task: teardown
     file: pipelines/shared/tasks/teardown.yml
 
-  - &create-environment
-    put: environment
-    params:
-      delete_on_failure: true
-      generate_random_name: true
-      terraform_source: pipelines/gcp/assets/terraform
-
-  - &destroy-environment
-    put: environment
-    params:
-      action: destroy
-      env_name_file: environment/name
-      terraform_source: pipelines/gcp/assets/terraform
-    get_params:
-      action: destroy
-
 jobs:
   - name: test-stemcell-ubuntu-trusty
     serial: true
@@ -91,7 +75,12 @@ jobs:
         - {get: syslog-release,  trigger: false}
         - {get: os-conf-release, trigger: false}
         - {get: bosh-linux-stemcell-builder, trigger: false}
-      - <<: *create-environment
+      - put: environment
+        params:
+          env_name: certify-gcp-test-stemcell-ubuntu-trusty
+          delete_on_failure: true
+          generate_random_name: true
+          terraform_source: pipelines/gcp/assets/terraform
       - do:
         - <<: *prepare-director
           params:
@@ -105,7 +94,14 @@ jobs:
               - <<: *teardown
         ensure:
           do:
-            - <<: *destroy-environment
+            - put: environment
+              params:
+                env_name: certify-gcp-test-stemcell-ubuntu-trusty
+                action: destroy
+                env_name_file: environment/name
+                terraform_source: pipelines/gcp/assets/terraform
+              get_params:
+                action: destroy
 
   - name: test-stemcell-ubuntu-xenial
     serial: true
@@ -122,7 +118,12 @@ jobs:
         - {get: syslog-release,  trigger: false}
         - {get: os-conf-release, trigger: false}
         - {get: bosh-linux-stemcell-builder, trigger: false}
-      - <<: *create-environment
+      - put: environment
+        params:
+          env_name: certify-gcp-test-stemcell-ubuntu-xenial
+          delete_on_failure: true
+          generate_random_name: true
+          terraform_source: pipelines/gcp/assets/terraform
       - do:
         - <<: *prepare-director
           params:
@@ -136,7 +137,14 @@ jobs:
               - <<: *teardown
         ensure:
           do:
-            - <<: *destroy-environment
+            - put: environment
+              params:
+                env_name: certify-gcp-test-stemcell-ubuntu-xenial
+                action: destroy
+                env_name_file: environment/name
+                terraform_source: pipelines/gcp/assets/terraform
+              get_params:
+                action: destroy
 
   - name: bats-centos-7
     serial: true
@@ -151,7 +159,12 @@ jobs:
         - {get: bosh-cli,        trigger: false}
         - {get: bats,            trigger: false}
         - {get: bosh-deployment, trigger: false}
-      - <<: *create-environment
+      - put: environment
+        params:
+          env_name: certify-gcp-bats-centos-7
+          delete_on_failure: true
+          generate_random_name: true
+          terraform_source: pipelines/gcp/assets/terraform
       - <<: *prepare-director
       - do:
           - <<: *deploy-director
@@ -165,7 +178,14 @@ jobs:
         ensure:
           do:
             - <<: *teardown
-            - <<: *destroy-environment
+            - put: environment
+              params:
+                env_name: certify-gcp-bats-centos-7
+                action: destroy
+                env_name_file: environment/name
+                terraform_source: pipelines/gcp/assets/terraform
+              get_params:
+                action: destroy
 
   - name: bats-ubuntu-trusty
     serial: true
@@ -179,7 +199,12 @@ jobs:
         - {get: bosh-cli,        trigger: false}
         - {get: bats,            trigger: false}
         - {get: bosh-deployment, trigger: false}
-      - <<: *create-environment
+      - put: environment
+        params:
+          env_name: certify-gcp-bats-ubuntu-trusty
+          delete_on_failure: true
+          generate_random_name: true
+          terraform_source: pipelines/gcp/assets/terraform
       - <<: *prepare-director
       - do:
           - <<: *deploy-director
@@ -191,7 +216,14 @@ jobs:
         ensure:
           do:
             - <<: *teardown
-            - <<: *destroy-environment
+            - put: environment
+              params:
+                env_name: certify-gcp-bats-ubuntu-trusty
+                action: destroy
+                env_name_file: environment/name
+                terraform_source: pipelines/gcp/assets/terraform
+              get_params:
+                action: destroy
 
   - name: bats-ubuntu-xenial
     serial: true
@@ -205,7 +237,12 @@ jobs:
         - {get: bosh-cli,        trigger: false}
         - {get: bats,            trigger: false}
         - {get: bosh-deployment, trigger: false}
-      - <<: *create-environment
+      - put: environment
+        params:
+          env_name: certify-gcp-bats-ubuntu-xenial
+          delete_on_failure: true
+          generate_random_name: true
+          terraform_source: pipelines/gcp/assets/terraform
       - <<: *prepare-director
       - do:
           - <<: *deploy-director
@@ -217,7 +254,14 @@ jobs:
         ensure:
           do:
             - <<: *teardown
-            - <<: *destroy-environment
+            - put: environment
+              params:
+                env_name: certify-gcp-bats-ubuntu-xenial
+                action: destroy
+                env_name_file: environment/name
+                terraform_source: pipelines/gcp/assets/terraform
+              get_params:
+                action: destroy
 
   - name: test-upgrade
     serial: true
@@ -235,7 +279,12 @@ jobs:
         - {get: old-bosh-release,        trigger: false, version: {version: {{old_bosh_release_version}}}, resource: bosh-release}
         - {get: old-cpi-release,         trigger: false, version: {version: "25.6.2"},  resource: cpi-release}
         - {get: bosh-deployment,         trigger: false}
-      - <<: *create-environment
+      - put: environment
+        params:
+          env_name: certify-gcp-test-upgrade
+          delete_on_failure: true
+          generate_random_name: true
+          terraform_source: pipelines/gcp/assets/terraform
       - <<: *prepare-director
         input_mapping:
           stemcell:     old-stemcell
@@ -272,7 +321,14 @@ jobs:
         ensure:
           do:
             - <<: *teardown
-            - <<: *destroy-environment
+            - put: environment
+              params:
+                env_name: certify-gcp-test-upgrade
+                action: destroy
+                env_name_file: environment/name
+                terraform_source: pipelines/gcp/assets/terraform
+              get_params:
+                action: destroy
 
   - name: certify-centos-7
     serial: true
