@@ -96,7 +96,7 @@ jobs:
         - {get: bosh-linux-stemcell-builder, trigger: false}
       - put: environment
         params:
-          env_name: certify-aws-test-stemcell-ubuntu-trusty
+          env_name: aws-test-stemcell-ubuntu-trusty
           delete_on_failure: true
           generate_random_name: true
           terraform_source: pipelines/aws/assets/terraform
@@ -119,7 +119,7 @@ jobs:
           do:
             - put: environment
               params:
-                env_name: certify-aws-test-stemcell-ubuntu-trusty
+                env_name: aws-test-stemcell-ubuntu-trusty
                 action: destroy
                 env_name_file: environment/name
                 terraform_source: pipelines/aws/assets/terraform
@@ -143,7 +143,7 @@ jobs:
         - {get: bosh-linux-stemcell-builder, trigger: false}
       - put: environment
         params:
-          env_name: certify-aws-test-stemcell-ubuntu-xenial
+          env_name: aws-test-stemcell-ubuntu-xenial
           delete_on_failure: true
           generate_random_name: true
           terraform_source: pipelines/aws/assets/terraform
