@@ -237,6 +237,7 @@ jobs:
         - {get: bosh-cli,        trigger: false}
         - {get: bats,            trigger: false}
         - {get: bosh-deployment, trigger: false}
+        - get: ubuntu-xenial-stemcell
         - get: stemcell
           resource: centos-7-stemcell
           trigger: true
@@ -256,8 +257,12 @@ jobs:
               -o pipelines/shared/assets/ops/remove-hm.yml
               -o bosh-deployment/external-ip-with-registry-not-recommended.yml
               -o pipelines/shared/assets/ops/remove-provider-cert.yml
+          input_mapping:
+            stemcell: ubuntu-xenial-stemcell
         - do:
           - <<: *deploy-director
+            input_mapping:
+              stemcell: ubuntu-xenial-stemcell
           - <<: *run-bats
             params:
               <<: *run-bats-params
