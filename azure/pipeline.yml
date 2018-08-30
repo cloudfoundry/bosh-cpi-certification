@@ -145,6 +145,7 @@ jobs:
         - {get: bosh-release,    trigger: true}
         - {get: cpi-release,     trigger: true}
         - {get: stemcell,        trigger: true, resource: centos-7-stemcell}
+        - {get: ubuntu-xenial-stemcell}
         - {get: after-midnight,  trigger: true}
         - {get: pipelines,       trigger: false}
         - {get: bosh-cli,        trigger: false}
@@ -152,8 +153,12 @@ jobs:
         - {get: bosh-deployment, trigger: false}
       - <<: *create-environment
       - <<: *prepare-director
+        input_mapping:
+          stemcell: ubuntu-xenial-stemcell
       - do:
           - <<: *deploy-director
+            input_mapping:
+              stemcell: ubuntu-xenial-stemcell
           - <<: *run-bats
             params:
               <<: *run-bats-params
