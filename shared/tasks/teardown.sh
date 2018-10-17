@@ -4,7 +4,7 @@ set -e
 
 source pipelines/shared/utils.sh
 source /etc/profile.d/chruby.sh
-chruby 2.1.7
+chruby 2.4.4
 
 if [ ! -e director-state/director-state.json ]; then
   echo "director-state.json does not exist, skipping..."
