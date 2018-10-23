@@ -21,7 +21,7 @@ set -e
 source pipelines/shared/utils.sh
 source pipelines/aws/utils.sh
 source /etc/profile.d/chruby.sh
-chruby 2.1.7
+chruby 2.4.4
 
 export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
 export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
