@@ -49,7 +49,7 @@ resource "aws_route_table_association" "a" {
 resource "aws_subnet" "default" {
   vpc_id = "${aws_vpc.default.id}"
   cidr_block = "${cidrsubnet(aws_vpc.default.cidr_block, 8, 0)}"
-  ipv6_cidr_block = "${cidrsubnet(aws_vpc.default.ipv6_cidr_block, 8, 1)}"
+  ipv6_cidr_block = "${cidrsubnet(aws_vpc.default.ipv6_cidr_block, 8, 0)}"
   depends_on = ["aws_internet_gateway.default"]
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
@@ -58,6 +58,23 @@ resource "aws_subnet" "default" {
   }
 
   map_public_ip_on_launch = true
+}
+
+resource "aws_route_table_association" "aws_resources" {
+  subnet_id = "${aws_subnet.aws_resources.id}"
+  route_table_id = "${aws_route_table.default.id}"
+}
+
+resource "aws_subnet" "aws_resources" {
+  vpc_id = "${aws_vpc.default.id}"
+  cidr_block = "${cidrsubnet(aws_vpc.default.cidr_block, 8, 1)}"
+  ipv6_cidr_block = "${cidrsubnet(aws_vpc.default.ipv6_cidr_block, 8, 1)}"
+  depends_on = ["aws_internet_gateway.default"]
+  availability_zone = "${data.aws_availability_zones.available.names[0]}"
+
+  tags {
+    Name = "${var.env_name}-aws-resources"
+  }
 }
 
 resource "aws_network_acl" "allow_all" {
@@ -129,7 +146,7 @@ resource "aws_elb" "e2e" {
   }
 
   subnets = [
-    "${aws_subnet.default.id}"]
+    "${aws_subnet.aws_resources.id}"]
 
   tags {
     Name = "${var.env_name}-e2e"
