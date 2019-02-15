@@ -11,6 +11,7 @@ bosh int \
   -o bosh-deployment/${INFRASTRUCTURE}/cpi.yml \
   -o bosh-deployment/misc/powerdns.yml \
   -o bosh-deployment/jumpbox-user.yml \
+  -o bosh-deployment/experimental/postgres-9-4.yml \
   -o pipelines/shared/assets/ops/custom-releases.yml \
   -o pipelines/${INFRASTRUCTURE}/assets/ops/custom-cpi-release.yml \
   $( echo ${OPTIONAL_OPS_FILE} ) \
