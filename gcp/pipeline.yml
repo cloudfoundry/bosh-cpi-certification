@@ -74,7 +74,7 @@ jobs:
         - {get: bosh-deployment, trigger: false}
         - {get: syslog-release,  trigger: false}
         - {get: os-conf-release, trigger: false}
-        - {get: bosh-linux-stemcell-builder, trigger: false}
+        - {get: bosh-linux-stemcell-builder, trigger: false, resource: bosh-linux-stemcell-builder-trusty}
       - put: environment
         params:
           env_name: certify-gcp-test-stemcell-ubuntu-trusty
@@ -461,6 +461,11 @@ resources:
     source:
       uri: https://github.com/cloudfoundry/bosh-linux-stemcell-builder
       branch: master
+  - name: bosh-linux-stemcell-builder-trusty
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry/bosh-linux-stemcell-builder
+      branch: 3586.x
   - name: syslog-release
     type: bosh-io-release
     source:
