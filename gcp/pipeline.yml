@@ -269,15 +269,15 @@ jobs:
       - aggregate:
         - {get: bosh-release,            trigger: true}
         - {get: cpi-release,             trigger: true}
-        - {get: stemcell,                trigger: true, resource: ubuntu-trusty-stemcell}
+        - {get: new-stemcell,            trigger: true, resource: ubuntu-xenial-stemcell}
         - {get: after-midnight,          trigger: true}
         - {get: pipelines,               trigger: false}
         - {get: bosh-cli,                trigger: false}
         - {get: centos-7-stemcell,       trigger: false} # pass-through
-        - {get: ubuntu-xenial-stemcell,  trigger: false} # pass-through
-        - {get: old-stemcell,            trigger: false, version: {version: "3363"}}
-        - {get: old-bosh-release,        trigger: false, version: {version: {{old_bosh_release_version}}}, resource: bosh-release}
-        - {get: old-cpi-release,         trigger: false, version: {version: "25.6.2"},  resource: cpi-release}
+        - {get: ubuntu-trusty-stemcell,  trigger: false} # pass-through
+        - {get: older-stemcell,          trigger: false}
+        - {get: old-bosh-release,        trigger: false}
+        - {get: old-cpi-release,         trigger: false}
         - {get: bosh-deployment,         trigger: false}
       - put: environment
         params:
@@ -287,33 +287,35 @@ jobs:
           terraform_source: pipelines/gcp/assets/terraform
       - <<: *prepare-director
         input_mapping:
-          stemcell:     old-stemcell
+          stemcell:     older-stemcell
           bosh-release: old-bosh-release
           cpi-release:  old-cpi-release
         params:
           <<: *prepare-director-params
           OPTIONAL_OPS_FILE: |
-            -o pipelines/shared/assets/ops/redis.yml
             -o bosh-deployment/external-ip-not-recommended.yml
             -o pipelines/shared/assets/ops/remove-provider-cert.yml
       - do:
           - <<: *deploy-director
             input_mapping:
-              stemcell:     old-stemcell
+              stemcell:     older-stemcell
               bosh-release: old-bosh-release
               cpi-release:  old-cpi-release
           - <<: *update-cloud-config
           - task: create-deployment
             file: pipelines/shared/tasks/create-deployment.yml
             input_mapping:
-              stemcell:        old-stemcell
+              stemcell:        older-stemcell
             params:
               INFRASTRUCTURE: gcp
               STEMCELL_NAME:  bosh-google-kvm-ubuntu-trusty-go_agent
           - <<: *prepare-director
+            input_mapping:
+              stemcell:     new-stemcell
           - task: test-upgrade
             file: pipelines/shared/tasks/test-upgrade.yml
             input_mapping:
+              stemcell: new-stemcell
               old-director-state: director-state
               new-director-config: director-config
             output_mapping:
@@ -401,6 +403,11 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry/bosh
+  - name: old-bosh-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry/bosh
+      regexp: 264.*
   - name: bosh-cli
     type: s3
     source:
@@ -425,6 +432,11 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry-incubator/bosh-google-cpi-release
+  - name: old-cpi-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry-incubator/bosh-google-cpi-release
+      regexp: 25.*.*
   - name: ubuntu-trusty-stemcell
     type: bosh-io-stemcell
     source:
@@ -433,10 +445,11 @@ resources:
     type: bosh-io-stemcell
     source:
       name: bosh-google-kvm-ubuntu-xenial-go_agent
-  - name: old-stemcell
+  - name: older-stemcell
     type: bosh-io-stemcell
     source:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
+      version_family: 3468.latest
   - name: centos-7-stemcell
     type: bosh-io-stemcell
     source:
