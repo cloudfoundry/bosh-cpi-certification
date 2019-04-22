@@ -216,7 +216,6 @@ jobs:
         params:
           <<: *prepare-director-params
           OPTIONAL_OPS_FILE: |
-            -o pipelines/shared/assets/ops/redis.yml
             -o bosh-deployment/vsphere/resource-pool.yml
             -o pipelines/shared/assets/ops/remove-provider-cert.yml
       - do:

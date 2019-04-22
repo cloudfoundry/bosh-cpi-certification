@@ -246,7 +246,6 @@ jobs:
         params:
           <<: *prepare-director-params
           OPTIONAL_OPS_FILE: |
-            -o pipelines/shared/assets/ops/redis.yml
             -o bosh-deployment/azure/custom-environment.yml
             -o bosh-deployment/azure/use-managed-disks.yml
             -o bosh-deployment/external-ip-with-registry-not-recommended.yml
