@@ -553,7 +553,7 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      branch: master
+      branch: v2_manifest
   - name: ubuntu-trusty-stemcell
     type: bosh-io-stemcell
     source:

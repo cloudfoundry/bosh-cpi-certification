@@ -418,7 +418,7 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      branch: master
+      branch: v2_manifest
   - name: receipt
     type: s3
     source:
