@@ -3,13 +3,10 @@ groups:
   - name: certify-gcp
     jobs:
       - bats-centos-7
-      - bats-ubuntu-trusty
       - bats-ubuntu-xenial
-      - test-stemcell-ubuntu-trusty
       - test-stemcell-ubuntu-xenial
       - test-upgrade
       - certify-centos-7
-      - certify-ubuntu-trusty
       - certify-ubuntu-xenial
 
 shared:
@@ -41,13 +38,6 @@ shared:
       BOSH_os_name: ubuntu-xenial
       package: ipv4director
 
-  - &test-stemcell-ubuntu-trusty
-    task: test-stemcell-ubuntu-trusty
-    file: pipelines/shared/tasks/test-stemcell.yml
-    params:
-      BOSH_os_name: ubuntu-trusty
-      package: ipv4director
-
   - &update-cloud-config
     task: update-cloud-config
     file: pipelines/shared/tasks/update-cloud-config.yml
@@ -60,49 +50,6 @@ shared:
     file: pipelines/shared/tasks/teardown.yml
 
 jobs:
-  - name: test-stemcell-ubuntu-trusty
-    serial: true
-    plan:
-      - aggregate:
-        - {get: bosh-release,    trigger: true}
-        - {get: cpi-release,     trigger: true}
-        - {get: stemcell,        trigger: true, resource: ubuntu-trusty-stemcell}
-        - {get: after-midnight,  trigger: true}
-        - {get: pipelines,       trigger: false}
-        - {get: bosh-cli,        trigger: false}
-        - {get: bats,            trigger: false}
-        - {get: bosh-deployment, trigger: false}
-        - {get: syslog-release,  trigger: false}
-        - {get: os-conf-release, trigger: false}
-        - {get: bosh-linux-stemcell-builder, trigger: false, resource: bosh-linux-stemcell-builder-trusty}
-      - put: environment
-        params:
-          env_name: certify-gcp-test-stemcell-ubuntu-trusty
-          delete_on_failure: true
-          generate_random_name: true
-          terraform_source: pipelines/gcp/assets/terraform
-      - do:
-        - <<: *prepare-director
-          params:
-            <<: *prepare-director-params
-        - do:
-          - <<: *deploy-director
-          - <<: *update-cloud-config
-          - <<: *test-stemcell-ubuntu-trusty
-          ensure:
-            do:
-              - <<: *teardown
-        ensure:
-          do:
-            - put: environment
-              params:
-                env_name: certify-gcp-test-stemcell-ubuntu-trusty
-                action: destroy
-                env_name_file: environment/name
-                terraform_source: pipelines/gcp/assets/terraform
-              get_params:
-                action: destroy
-
   - name: test-stemcell-ubuntu-xenial
     serial: true
     plan:
@@ -153,7 +100,7 @@ jobs:
         - {get: bosh-release,    trigger: true}
         - {get: cpi-release,     trigger: true}
         - {get: stemcell,        trigger: true,  resource: centos-7-stemcell}
-        - {get: ubuntu-stemcell, trigger: false, resource: ubuntu-trusty-stemcell}
+        - {get: ubuntu-stemcell, trigger: false, resource: ubuntu-xenial-stemcell}
         - {get: after-midnight,  trigger: true}
         - {get: pipelines,       trigger: false}
         - {get: bosh-cli,        trigger: false}
@@ -181,44 +128,6 @@ jobs:
             - put: environment
               params:
                 env_name: certify-gcp-bats-centos-7
-                action: destroy
-                env_name_file: environment/name
-                terraform_source: pipelines/gcp/assets/terraform
-              get_params:
-                action: destroy
-
-  - name: bats-ubuntu-trusty
-    serial: true
-    plan:
-      - aggregate:
-        - {get: bosh-release,    trigger: true}
-        - {get: cpi-release,     trigger: true}
-        - {get: stemcell,        trigger: true, resource: ubuntu-trusty-stemcell}
-        - {get: after-midnight,  trigger: true}
-        - {get: pipelines,       trigger: false}
-        - {get: bosh-cli,        trigger: false}
-        - {get: bats,            trigger: false}
-        - {get: bosh-deployment, trigger: false}
-      - put: environment
-        params:
-          env_name: certify-gcp-bats-ubuntu-trusty
-          delete_on_failure: true
-          generate_random_name: true
-          terraform_source: pipelines/gcp/assets/terraform
-      - <<: *prepare-director
-      - do:
-          - <<: *deploy-director
-          - <<: *run-bats
-            params:
-              <<: *run-bats-params
-              STEMCELL_NAME:   bosh-google-kvm-ubuntu-trusty-go_agent
-              BAT_RSPEC_FLAGS: "--tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip"
-        ensure:
-          do:
-            - <<: *teardown
-            - put: environment
-              params:
-                env_name: certify-gcp-bats-ubuntu-trusty
                 action: destroy
                 env_name_file: environment/name
                 terraform_source: pipelines/gcp/assets/terraform
@@ -274,7 +183,6 @@ jobs:
         - {get: pipelines,               trigger: false}
         - {get: bosh-cli,                trigger: false}
         - {get: centos-7-stemcell,       trigger: false} # pass-through
-        - {get: ubuntu-trusty-stemcell,  trigger: false} # pass-through
         - {get: older-stemcell,          trigger: false}
         - {get: old-bosh-release,        trigger: false}
         - {get: old-cpi-release,         trigger: false}
@@ -308,7 +216,7 @@ jobs:
               stemcell:        older-stemcell
             params:
               INFRASTRUCTURE: gcp
-              STEMCELL_NAME:  bosh-google-kvm-ubuntu-trusty-go_agent
+              STEMCELL_NAME:  bosh-google-kvm-ubuntu-xenial-go_agent
           - <<: *prepare-director
             input_mapping:
               stemcell:     new-stemcell
@@ -345,21 +253,6 @@ jobs:
         params:
           CPI_RELEASE_NAME: bosh-google-cpi
           STEMCELL_NAME:    bosh-google-kvm-centos-7-go_agent
-      - {put: receipt, params: {file: certification/*-receipt.json}}
-
-  - name: certify-ubuntu-trusty
-    serial: true
-    plan:
-      - aggregate:
-        - {get: bosh-release, trigger: true, passed: [bats-ubuntu-trusty]}
-        - {get: cpi-release,  trigger: true, passed: [bats-ubuntu-trusty]}
-        - {get: stemcell,     trigger: true, passed: [bats-ubuntu-trusty, test-upgrade, test-stemcell-ubuntu-trusty], resource: ubuntu-trusty-stemcell}
-        - {get: pipelines,    trigger: false}
-      - task: generate
-        file: pipelines/shared/tasks/generate-receipt.yml
-        params:
-          CPI_RELEASE_NAME: bosh-google-cpi
-          STEMCELL_NAME:    bosh-google-kvm-ubuntu-trusty-go_agent
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
   - name: certify-ubuntu-xenial
@@ -437,10 +330,6 @@ resources:
     source:
       repository: cloudfoundry-incubator/bosh-google-cpi-release
       regexp: 25.*.*
-  - name: ubuntu-trusty-stemcell
-    type: bosh-io-stemcell
-    source:
-      name: bosh-google-kvm-ubuntu-trusty-go_agent
   - name: ubuntu-xenial-stemcell
     type: bosh-io-stemcell
     source:
@@ -448,8 +337,8 @@ resources:
   - name: older-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-google-kvm-ubuntu-trusty-go_agent
-      version_family: 3468.latest
+      name: bosh-google-kvm-ubuntu-xenial-go_agent
+      version_family: 97.latest
   - name: centos-7-stemcell
     type: bosh-io-stemcell
     source:
@@ -474,11 +363,6 @@ resources:
     source:
       uri: https://github.com/cloudfoundry/bosh-linux-stemcell-builder
       branch: master
-  - name: bosh-linux-stemcell-builder-trusty
-    type: git
-    source:
-      uri: https://github.com/cloudfoundry/bosh-linux-stemcell-builder
-      branch: 3586.x
   - name: syslog-release
     type: bosh-io-release
     source:
