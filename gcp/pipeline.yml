@@ -300,7 +300,7 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry/bosh
-      regexp: 264.*
+      regexp: 267.*
   - name: bosh-cli
     type: s3
     source:
@@ -329,7 +329,7 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry-incubator/bosh-google-cpi-release
-      regexp: 25.*.*
+      regexp: 27.*.*
   - name: ubuntu-xenial-stemcell
     type: bosh-io-stemcell
     source:
