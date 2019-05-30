@@ -15,7 +15,7 @@ properties:
       subnets:
       - range: ((internal_cidr))
         gateway: ((internal_gw))
-        static: ((reserved_range))
+        static: ((static_range))
         cloud_properties:
           network_name: ((network))
           subnetwork_name: ((subnetwork))
