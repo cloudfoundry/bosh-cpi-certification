@@ -208,7 +208,7 @@ jobs:
           - <<: *run-bats
             params:
               <<: *run-bats-params
-              STEMCELL_NAME: *centos-7-stemcell
+              STEMCELL_NAME: bosh-aws-xen-hvm-centos-7-go_agent
           ensure:
             do:
               - <<: *teardown
@@ -258,7 +258,7 @@ jobs:
           - <<: *run-bats
             params:
               <<: *run-bats-params
-              STEMCELL_NAME: *ubuntu-xenial-stemcell
+              STEMCELL_NAME: bosh-aws-xen-hvm-ubuntu-xenial-go_agent
           ensure:
             do:
               - <<: *teardown
@@ -360,7 +360,7 @@ jobs:
         file: pipelines/shared/tasks/generate-receipt.yml
         params:
           CPI_RELEASE_NAME: bosh-aws-cpi
-          STEMCELL_NAME:    *centos-7-stemcell
+          STEMCELL_NAME:    bosh-aws-xen-hvm-centos-7-go_agent
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
   - name: certify-ubuntu-xenial
@@ -375,7 +375,7 @@ jobs:
         file: pipelines/shared/tasks/generate-receipt.yml
         params:
           CPI_RELEASE_NAME: bosh-aws-cpi
-          STEMCELL_NAME:    *ubuntu-xenial-stemcell
+          STEMCELL_NAME:    bosh-aws-xen-hvm-ubuntu-xenial-go_agent
       - {put: receipt, params: {file: certification/*-receipt.json}}
 
 resource_types:
@@ -415,7 +415,7 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry-incubator/bosh-aws-cpi-release
-      regexp: 69
+      regexp: 72
   - name: bosh-release
     type: bosh-io-release
     source:
@@ -424,7 +424,7 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry/bosh
-      regexp: 264.*
+      regexp: 267.*
   - name: bats
     type: git
     source:
@@ -438,16 +438,17 @@ resources:
   - name: old-stemcell
     type: bosh-io-stemcell
     source:
-      name: *ubuntu-xenial-stemcell
+      name: bosh-aws-xen-hvm-ubuntu-xenial-go_agent
       version_family: 97.latest
   - name: centos-7-stemcell
     type: bosh-io-stemcell
     source:
-      name: &centos-7-stemcell bosh-aws-xen-hvm-centos-7-go_agent
+      name: bosh-aws-xen-hvm-centos-7-go_agent
+      force_regular: true
   - name: ubuntu-xenial-stemcell
     type: bosh-io-stemcell
     source:
-      name: &ubuntu-xenial-stemcell bosh-aws-xen-hvm-ubuntu-xenial-go_agent
+      name: bosh-aws-xen-hvm-ubuntu-xenial-go_agent
   - name: bosh-cli
     type: s3
     source:
