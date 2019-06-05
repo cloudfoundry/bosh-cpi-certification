@@ -16,7 +16,7 @@ data "aws_availability_zones" "available" {}
 resource "aws_vpc" "default" {
   assign_generated_ipv6_cidr_block = true
   cidr_block = "10.0.0.0/16"
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -24,7 +24,7 @@ resource "aws_vpc" "default" {
 # Create an internet gateway to give our subnet access to the outside world
 resource "aws_internet_gateway" "default" {
   vpc_id = "${aws_vpc.default.id}"
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -36,7 +36,7 @@ resource "aws_route_table" "default" {
     gateway_id = "${aws_internet_gateway.default.id}"
   }
 
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -53,7 +53,7 @@ resource "aws_subnet" "default" {
   depends_on = ["aws_internet_gateway.default"]
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 
@@ -72,7 +72,7 @@ resource "aws_subnet" "aws_resources" {
   depends_on = ["aws_internet_gateway.default"]
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
-  tags {
+  tags = {
     Name = "${var.env_name}-aws-resources"
   }
 }
@@ -98,7 +98,7 @@ resource "aws_network_acl" "allow_all" {
     to_port = 0
   }
 
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -123,7 +123,7 @@ resource "aws_security_group" "allow_all" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "${var.env_name}"
   }
 }
@@ -148,7 +148,7 @@ resource "aws_elb" "e2e" {
   subnets = [
     "${aws_subnet.aws_resources.id}"]
 
-  tags {
+  tags = {
     Name = "${var.env_name}-e2e"
   }
 }
