@@ -25,7 +25,6 @@ variable "resource_group_prefix" {
 
 # Configure the Microsoft Azure Provider
 provider "azurerm" {
-  version         = "~> 1.0.1"
   client_id       = "${var.azure_client_id}"
   client_secret   = "${var.azure_client_secret}"
   subscription_id = "${var.azure_subscription_id}"
