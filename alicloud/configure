@@ -1,0 +1,3 @@
+fly -t stemcell sp -p certify-alibaba-cloud \
+  -c pipeline.yml \
+  --load-vars-from=vars-pipeline-develop.yaml

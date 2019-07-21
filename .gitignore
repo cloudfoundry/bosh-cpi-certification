@@ -18,3 +18,7 @@ dev_releases
 releases/*.tgz
 releases/**/*.tgz
 tmp/
+.terraform
+*terraform.tfstate*
+*terraform.log*
+vars-pipeline*

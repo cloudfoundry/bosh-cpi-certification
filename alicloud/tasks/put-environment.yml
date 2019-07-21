@@ -1,0 +1,32 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: {repository: boshcpi/aws-cpi-release}
+
+inputs:
+  - name: pipelines
+
+outputs:
+  - name: environment
+
+run:
+  path: pipelines/alicloud/tasks/put-environment.sh
+params:
+  access_key: ""
+  secret_key: ""
+  region: ""
+  env_name: ""
+  public_key: ""
+  delete_on_failure: false
+  generate_random_name: false
+  action: ""
+  terraform_source: ""
+  output_module: ""
+  remote_state_access_key: ""
+  remote_state_secret_key: ""
+  remote_state_region: ""
+  remote_state_bucket: ""
+  remote_state_file_path: ""
+  remote_state_file_name: ""
