@@ -1,0 +1,22 @@
+---
+cpi: alicloud
+properties:
+  vip: ((bats_eip))
+  second_static_ip: ((network_static_ip_2))
+  pool_size: 1
+  stemcell:
+    name: ((stemcell_name))
+    version: latest
+  instances: 1
+  availability_zone: ((zone))
+  key_name:  ((key_pair_name))
+  networks:
+    - name: default
+      static_ip: ((network_static_ip_1))
+      type: manual
+      cidr: ((internal_cidr))
+      reserved: [((reserved_range))]
+      static: [((static_range))]
+      gateway: ((internal_gw))
+      subnet: ((vswitch_id))
+      security_groups: ((security_group_id))

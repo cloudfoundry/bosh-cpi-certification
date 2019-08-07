@@ -67,6 +67,7 @@ The folder structure looks like this:
 # BOSH CPIs
 * [vSphere](https://github.com/cloudfoundry-incubator/bosh-vsphere-cpi-release)
 * [AWS](https://github.com/cloudfoundry-incubator/bosh-aws-cpi-release)
+* [AlibabaCloud](https://github.com/cloudfoundry-incubator/bosh-alicloud-cpi-release)
 * [vCloud](https://github.com/cloudfoundry-incubator/bosh-vcloud-cpi-release)
 * [GCP](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release)
 * [OpenStack](https://github.com/cloudfoundry-incubator/bosh-openstack-cpi-release)

@@ -1,0 +1,5 @@
+- type: replace
+  path: /releases/name=bosh-alicloud-cpi
+  value:
+    name: bosh-alicloud-cpi
+    url: ((cpi_release_uri))
