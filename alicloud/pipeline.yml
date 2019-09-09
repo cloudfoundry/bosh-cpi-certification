@@ -221,12 +221,12 @@ resources:
   - name: pipelines
     type: git
     source:
-      uri: https://github.com/aliyun/bosh-cpi-certification
+      uri: https://github.com/cloudfoundry-incubator/bosh-cpi-certification
       branch: master
   - name: bosh-deployment
     type: git
     source:
-      uri: https://github.com/aliyun/bosh-deployment
+      uri: https://github.com/cloudfoundry/bosh-deployment
       branch: master
   - name: cpi-release
     type: github-release
@@ -242,8 +242,8 @@ resources:
   - name: bats
     type: git
     source:
-      uri: https://github.com/aliyun/bosh-acceptance-tests.git
-      branch: alicloud
+      uri: https://github.com/cloudfoundry/bosh-acceptance-tests
+      branch: master
   - name: ubuntu-xenial-stemcell
     type: bosh-io-stemcell
     source:
