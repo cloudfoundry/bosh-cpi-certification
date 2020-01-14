@@ -5,8 +5,10 @@ set -e
 : ${NETWORK_NAME:?}
 
 source pipelines/shared/utils.sh
-source /etc/profile.d/chruby.sh
-chruby 2.4.4
+if [[ -f "/etc/profile.d/chruby.sh" ]] ; then
+  source /etc/profile.d/chruby.sh
+  chruby 2.4.4
+fi
 
 # inputs
 input_dir=$(realpath director-config/)

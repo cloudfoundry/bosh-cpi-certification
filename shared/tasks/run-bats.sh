@@ -9,8 +9,10 @@ set -e
 : ${BAT_RSPEC_FLAGS:?}
 
 source pipelines/shared/utils.sh
-source /etc/profile.d/chruby.sh
-chruby 2.4.4
+if [[ -f "/etc/profile.d/chruby.sh" ]] ; then
+  source /etc/profile.d/chruby.sh
+  chruby 2.4.4
+fi
 
 metadata="$( cat environment/metadata )"
 mkdir -p bats-config

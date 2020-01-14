@@ -3,8 +3,10 @@
 set -e
 
 source pipelines/shared/utils.sh
-source /etc/profile.d/chruby.sh
-chruby 2.4.4
+if [[ -f "/etc/profile.d/chruby.sh" ]] ; then
+  source /etc/profile.d/chruby.sh
+  chruby 2.4.4
+fi
 
 : ${DEPLOYMENT_NAME:?}
 
