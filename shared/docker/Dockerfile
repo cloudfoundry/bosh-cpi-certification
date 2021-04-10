@@ -16,7 +16,7 @@ RUN apt-get update && \
     wget && \
     apt-get clean
 
-ENV RUBY_INSTALL_VERSION=0.6.1 CHRUBY_VERSION=0.3.9 RUBY_VERSION=2.4.4 JQ_VERSION=1.5
+ENV RUBY_INSTALL_VERSION=0.6.1 CHRUBY_VERSION=0.3.9 RUBY_VERSION=2.4.4 JQ_VERSION=1.5 RUBY_27_VERSION=2.7.3
 
 # Import stedolan PGP key (jq)
 RUN wget -nv https://raw.githubusercontent.com/stedolan/jq/master/sig/jq-release.key && \
@@ -66,4 +66,14 @@ RUN /bin/bash -l -c "                            \
   source /etc/profile.d/chruby.sh ;              \
   chruby $RUBY_VERSION ;                         \
   gem install bundler --no-ri --no-rdoc          \
+"
+
+# Install Ruby 2.7
+RUN ruby-install ruby $RUBY_27_VERSION -- --disable-install-rdoc
+
+# Install Bundler
+RUN /bin/bash -l -c "                            \
+  source /etc/profile.d/chruby.sh ;              \
+  chruby $RUBY_27_VERSION ;                      \
+  gem install bundler --no-document              \
 "
