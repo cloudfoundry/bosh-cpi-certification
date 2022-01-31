@@ -1,12 +1,11 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
-RUN locale-gen en_US.UTF-8
-RUN dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    locales \
     ca-certificates \
     curl \
     git \
@@ -16,7 +15,9 @@ RUN apt-get update && \
     wget && \
     apt-get clean
 
-ENV RUBY_INSTALL_VERSION=0.6.1 CHRUBY_VERSION=0.3.9 RUBY_VERSION=2.4.4 JQ_VERSION=1.5 RUBY_27_VERSION=2.7.3
+RUN locale-gen en_US.UTF-8
+
+ENV RUBY_INSTALL_VERSION=0.8.3 CHRUBY_VERSION=0.3.9 RUBY_VERSION=2.4.4 JQ_VERSION=1.5 RUBY_27_VERSION=2.7.3
 
 # Import stedolan PGP key (jq)
 RUN wget -nv https://raw.githubusercontent.com/stedolan/jq/master/sig/jq-release.key && \
@@ -45,7 +46,7 @@ RUN cd /tmp && \
     gpg --verify chruby-$CHRUBY_VERSION.tar.gz.asc chruby-$CHRUBY_VERSION.tar.gz && \
     tar -xzvf chruby-$CHRUBY_VERSION.tar.gz && \
     cd chruby-$CHRUBY_VERSION/ && \
-    sudo ./scripts/setup.sh && \
+    ./scripts/setup.sh && \
     rm -rf /tmp/chruby-$CHRUBY_VERSION && rm /tmp/*
 
 # Install ruby-install
@@ -55,7 +56,7 @@ RUN cd /tmp && \
     gpg --verify ruby-install-$RUBY_INSTALL_VERSION.tar.gz.asc ruby-install-$RUBY_INSTALL_VERSION.tar.gz && \
     tar -xzvf ruby-install-$RUBY_INSTALL_VERSION.tar.gz && \
     cd ruby-install-$RUBY_INSTALL_VERSION/ && \
-    sudo make install && \
+    make install && \
     rm -rf /tmp/ruby-install-$RUBY_INSTALL_VERSION && rm /tmp/*
 
 # Install Ruby
