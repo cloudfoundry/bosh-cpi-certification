@@ -68,12 +68,12 @@ resource "azurerm_subnet" "azure_bats_subnet_2" {
 
 # Create a Storage Account in the azure_rg_bosh resouce group
 resource "azurerm_storage_account" "azure_bosh_sa" {
-  name                     = replace(var.env_name, "-", "")
-  resource_group_name      = azurerm_resource_group.azure_rg_bosh.name
-  location                 = var.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  allow_blob_public_access = true
+  name                            = replace(var.env_name, "-", "")
+  resource_group_name             = azurerm_resource_group.azure_rg_bosh.name
+  location                        = var.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  allow_nested_items_to_be_public = true
 }
 # Create a Storage Container for the bosh director
 resource "azurerm_storage_container" "azure_bosh_container" {
@@ -145,18 +145,18 @@ resource "azurerm_network_security_group" "azure_bosh_nsg" {
 
 # Public IP Address for bosh
 resource "azurerm_public_ip" "azure_ip_bosh" {
-  name                         = "azure_ip_bosh"
-  location                     = var.location
-  resource_group_name          = azurerm_resource_group.azure_rg_bosh.name
-  allocation_method            = "Static"
+  name                = "azure_ip_bosh"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.azure_rg_bosh.name
+  allocation_method   = "Static"
 }
 
 # Public IP Address for BATS
 resource "azurerm_public_ip" "azure_ip_bats" {
-  name                         = "azure_ip_bats"
-  location                     = var.location
-  resource_group_name          = azurerm_resource_group.azure_rg_bosh.name
-  allocation_method            = "Static"
+  name                = "azure_ip_bats"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.azure_rg_bosh.name
+  allocation_method   = "Static"
 }
 
 output "external_ip" {
@@ -200,22 +200,22 @@ output "bats_public_ip" {
 }
 output "bats_first_network" {
   value = {
-    name = azurerm_subnet.azure_bats_subnet.name
-    cidr = azurerm_subnet.azure_bats_subnet.address_prefix
-    gateway = cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 1)
+    name           = azurerm_subnet.azure_bats_subnet.name
+    cidr           = azurerm_subnet.azure_bats_subnet.address_prefix
+    gateway        = cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 1)
     reserved_range = "${cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 2)}-${cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 3)}"
-    static_range =  "${cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 4)}-${cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 10)}"
-    static_ip_1 = cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 4)
-    static_ip_2 = cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 5)
+    static_range   = "${cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 4)}-${cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 10)}"
+    static_ip_1    = cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 4)
+    static_ip_2    = cidrhost(azurerm_subnet.azure_bats_subnet.address_prefix, 5)
   }
 }
 output "bats_second_network" {
   value = {
-    name = azurerm_subnet.azure_bats_subnet_2.name
-    cidr = azurerm_subnet.azure_bats_subnet_2.address_prefix
-    gateway = cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 1)
+    name           = azurerm_subnet.azure_bats_subnet_2.name
+    cidr           = azurerm_subnet.azure_bats_subnet_2.address_prefix
+    gateway        = cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 1)
     reserved_range = "${cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 2)}-${cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 3)}"
-    static_range =  "${cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 4)}-${cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 10)}"
-    static_ip_1 = cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 4)
+    static_range   = "${cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 4)}-${cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 10)}"
+    static_ip_1    = cidrhost(azurerm_subnet.azure_bats_subnet_2.address_prefix, 4)
   }
 }
