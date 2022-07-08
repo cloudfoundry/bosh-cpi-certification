@@ -11,7 +11,7 @@ set -e
 source pipelines/shared/utils.sh
 if [[ -f "/etc/profile.d/chruby.sh" ]] ; then
   source /etc/profile.d/chruby.sh
-  chruby 2.4.4
+  chruby $RUBY_VERSION
 fi
 
 metadata="$( cat environment/metadata )"

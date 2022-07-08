@@ -11,3 +11,5 @@ inputs:
 
 run:
   path: pipelines/shared/tasks/teardown.sh
+params:
+  RUBY_VERSION: 2.4.4

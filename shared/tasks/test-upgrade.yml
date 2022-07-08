@@ -21,3 +21,4 @@ run:
 
 params:
   DEPLOYMENT_NAME: certification
+  RUBY_VERSION: 2.4.4
