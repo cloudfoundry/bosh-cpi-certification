@@ -51,7 +51,6 @@ shared:
     params: &run-bats-params
       INFRASTRUCTURE:     vsphere
       BAT_INFRASTRUCTURE: vsphere
-      BAT_NETWORKING:     manual
       BAT_RSPEC_FLAGS:    "--tag ~vip_networking --tag ~dynamic_networking --tag ~root_partition --tag ~raw_ephemeral_storage"
 
   - &test-stemcell

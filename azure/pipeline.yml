@@ -36,7 +36,6 @@ shared:
     params: &run-bats-params
       INFRASTRUCTURE:     azure
       BAT_INFRASTRUCTURE: azure
-      BAT_NETWORKING:     manual
 
   - &test-stemcell-ubuntu-trusty
     task: test-stemcell-ubuntu-trusty

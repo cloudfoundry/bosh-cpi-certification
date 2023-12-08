@@ -41,7 +41,6 @@ shared:
     params: &run-bats-params
       INFRASTRUCTURE:     aws
       BAT_INFRASTRUCTURE: aws
-      BAT_NETWORKING:     manual
       BAT_RSPEC_FLAGS:    "--tag ~multiple_manual_networks --tag ~root_partition"
 
   - &test-stemcell-ubuntu-xenial

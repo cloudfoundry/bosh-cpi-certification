@@ -19,6 +19,5 @@ params:
   INFRASTRUCTURE:     ""
   STEMCELL_NAME:      ""
   BAT_INFRASTRUCTURE: ""
-  BAT_NETWORKING:     ""
   BAT_RSPEC_FLAGS:    ""
   RUBY_VERSION: 2.4.4

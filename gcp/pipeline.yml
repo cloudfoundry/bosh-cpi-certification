@@ -29,7 +29,6 @@ shared:
     params: &run-bats-params
       INFRASTRUCTURE:     gcp
       BAT_INFRASTRUCTURE: gcp
-      BAT_NETWORKING:     dynamic
 
   - &test-stemcell-ubuntu-xenial
     task: test-stemcell-ubuntu-xenial

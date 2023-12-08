@@ -35,7 +35,6 @@ shared:
     params: &run-bats-params
       INFRASTRUCTURE:     alicloud
       BAT_INFRASTRUCTURE: alicloud
-      BAT_NETWORKING:     manual
       BAT_RSPEC_FLAGS:    "--tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~persistent_disk"
     on_failure:
       put: notify

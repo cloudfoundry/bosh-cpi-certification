@@ -57,11 +57,16 @@ pushd ${output_dir} > /dev/null
   fi
 popd > /dev/null
 
+director_ip=$( state_path "/instance_groups/name=bosh/networks/name=${NETWORK_NAME}/static_ips/0" )
+ssh_private_key=$( creds_path /jumpbox_ssh/private_key | sed 's/$/\\n/' | tr -d '\n' )
+
 cat > "${output_dir}/director.env" <<EOF
-export BOSH_ENVIRONMENT="$( state_path /instance_groups/name=bosh/networks/name=${NETWORK_NAME}/static_ips/0 2>/dev/null )"
+export BOSH_ENVIRONMENT="${director_ip}"
 export BOSH_CLIENT="admin"
 export BOSH_CLIENT_SECRET="$( creds_path /admin_password )"
 export BOSH_CA_CERT="$( creds_path /director_ssl/ca )"
-export BOSH_GW_HOST="${BOSH_ENVIRONMENT}"
-export BOSH_GW_USER="jumpbox"
+private_key_path=\$(mktemp)
+echo -e "${ssh_private_key}" > \${private_key_path}
+
+export BOSH_ALL_PROXY="ssh+socks5://jumpbox@${director_ip}:22?private-key=\${private_key_path}"
 EOF

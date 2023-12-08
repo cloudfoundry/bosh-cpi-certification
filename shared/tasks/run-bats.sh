@@ -5,7 +5,6 @@ set -e
 : ${INFRASTRUCTURE:?}
 : ${STEMCELL_NAME:?}
 : ${BAT_INFRASTRUCTURE:?}
-: ${BAT_NETWORKING:?}
 : ${BAT_RSPEC_FLAGS:?}
 
 source pipelines/shared/utils.sh
@@ -18,11 +17,11 @@ metadata="$( cat environment/metadata )"
 mkdir -p bats-config
 bosh int pipelines/${INFRASTRUCTURE}/assets/bats/bats-spec.yml \
   -v "stemcell_name=${STEMCELL_NAME}" \
+  -v "ssh_private_key=$( creds_path /jumpbox_ssh/private_key )" \
+  -v "ssh_public_key=$( creds_path /jumpbox_ssh/public_key )" \
   -l environment/metadata > bats-config/bats-config.yml
 
 source director-state/director.env
-export BAT_PRIVATE_KEY="$( creds_path /jumpbox_ssh/private_key )"
-export BAT_DNS_HOST="${BOSH_ENVIRONMENT}"
 export BAT_STEMCELL=$(realpath stemcell/*.tgz)
 export BAT_DEPLOYMENT_SPEC=$(realpath bats-config/bats-config.yml)
 export BAT_BOSH_CLI=$(which bosh)
