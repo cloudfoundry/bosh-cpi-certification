@@ -7,7 +7,6 @@ image_resource:
 inputs:
 - name: bosh-linux-stemcell-builder
 - name: pipelines
-- name: bosh-cli
 - name: stemcell
 - name: syslog-release
 - name: os-conf-release

@@ -9,7 +9,6 @@ inputs:
   - name: bosh-release
   - name: cpi-release
   - name: stemcell
-  - name: bosh-cli
   - name: new-director-config
   - name: old-director-state
 

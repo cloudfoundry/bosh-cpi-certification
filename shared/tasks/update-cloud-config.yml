@@ -6,7 +6,6 @@ image_resource:
 
 inputs:
 - name: pipelines
-- name: bosh-cli
 - name: bosh-deployment
 - name: environment
 - name: director-state

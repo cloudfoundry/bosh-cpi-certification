@@ -7,7 +7,6 @@ image_resource:
 inputs:
   - name: pipelines
   - name: director-state
-  - name: bosh-cli
 
 run:
   path: pipelines/shared/tasks/teardown.sh

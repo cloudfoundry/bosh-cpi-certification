@@ -7,7 +7,6 @@ image_resource:
 inputs:
   - name: pipelines
   - name: director-config
-  - name: bosh-cli
   - name: bosh-release
   - name: cpi-release
   - name: stemcell
