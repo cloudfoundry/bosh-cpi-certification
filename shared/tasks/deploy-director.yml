@@ -2,21 +2,21 @@
 platform: linux
 image_resource:
   type: docker-image
-  source: {repository: bosh/integration, tag: main }
+  source: { repository: bosh/integration, tag: main }
 
 inputs:
-  - name: pipelines
-  - name: director-config
-  - name: bosh-release
-  - name: cpi-release
-  - name: stemcell
+- name: pipelines
+- name: director-config
+- name: bosh-release
+- name: cpi-release
+- name: stemcell
 
 outputs:
-  - name: director-state
+- name: director-state
 
 run:
   path: pipelines/shared/tasks/deploy-director.sh
 
 params:
   NETWORK_NAME: public
-  RUBY_VERSION: 2.4.4
+  RUBY_VERSION:

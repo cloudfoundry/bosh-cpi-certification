@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-
-set -e
+set -euo pipefail
 
 source pipelines/shared/utils.sh
 if [[ -f "/etc/profile.d/chruby.sh" ]] ; then
   source /etc/profile.d/chruby.sh
-  chruby $RUBY_VERSION
+  chruby "${RUBY_VERSION}"
 fi
 
 if [ ! -e director-state/director-state.json ]; then

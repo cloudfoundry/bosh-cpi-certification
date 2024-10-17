@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
-
-set -e
-
-: ${NETWORK_NAME:?}
+set -euo pipefail
 
 source pipelines/shared/utils.sh
 if [[ -f "/etc/profile.d/chruby.sh" ]] ; then
   source /etc/profile.d/chruby.sh
-  chruby $RUBY_VERSION
+  chruby "${RUBY_VERSION}"
 fi
 
 # inputs
@@ -44,7 +41,8 @@ pushd ${output_dir} > /dev/null
   echo "deploying BOSH..."
 
   set +e
-  BOSH_LOG_PATH=$logfile bosh create-env \
+  export BOSH_LOG_PATH=$logfile
+  bosh create-env \
     --vars-store "${output_dir}/creds.yml" \
     director.yml
   bosh_cli_exit_code="$?"
