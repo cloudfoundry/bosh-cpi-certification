@@ -15,11 +15,6 @@ export OS_CONF_RELEASE_PATH=$(realpath os-conf-release/*.tgz)
 export STEMCELL_PATH=$(realpath stemcell/*.tgz)
 export BOSH_stemcell_version=\"$(realpath stemcell/version | xargs -n 1 cat)\"
 
-pushd bosh-linux-stemcell-builder
-  export PATH=/usr/local/go/bin:$PATH
-  export GOPATH=$(pwd)
-
-  pushd src/github.com/cloudfoundry/stemcell-acceptance-tests
-    ./bin/test-smoke $package
-  popd
+pushd bosh-linux-stemcell-builder/acceptance-tests
+  ./bin/test-smoke $package
 popd
