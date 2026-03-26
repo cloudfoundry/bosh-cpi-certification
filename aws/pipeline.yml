@@ -14,6 +14,7 @@ shared:
   - &prepare-director
     task: prepare-director
     file: pipelines/shared/tasks/prepare-director.yml
+    image: bosh-integration-registry-image
     params: &prepare-director-params
       INFRASTRUCTURE:     aws
       DIRECTOR_VARS_FILE: {{aws_director_vars_file}}
@@ -24,6 +25,7 @@ shared:
   - &prepare-director-xenial
     task: prepare-director
     file: pipelines/shared/tasks/prepare-director.yml
+    image: bosh-integration-registry-image
     params: &prepare-director-params
       INFRASTRUCTURE:     aws
       DIRECTOR_VARS_FILE: {{aws_director_vars_file}}
@@ -34,10 +36,12 @@ shared:
   - &deploy-director
     task: deploy-director
     file: pipelines/shared/tasks/deploy-director.yml
+    image: bosh-integration-registry-image
 
   - &run-bats
     task: run-bats
     file: pipelines/shared/tasks/run-bats.yml
+    image: bosh-integration-registry-image
     params: &run-bats-params
       INFRASTRUCTURE:     aws
       BAT_INFRASTRUCTURE: aws
@@ -46,6 +50,7 @@ shared:
   - &test-stemcell-ubuntu-xenial
     task: test-stemcell-ubuntu-xenial
     file: pipelines/shared/tasks/test-stemcell.yml
+    image: bosh-integration-registry-image
     params:
       BOSH_os_name: ubuntu-xenial
       package: ipv4director
@@ -53,6 +58,7 @@ shared:
   - &update-cloud-config
     task: update-cloud-config
     file: pipelines/shared/tasks/update-cloud-config.yml
+    image: bosh-integration-registry-image
     params: &update-cloud-config-params
       INFRASTRUCTURE: aws
       DIRECTOR_VARS_FILE: {{aws_director_vars_file}}
@@ -66,6 +72,7 @@ shared:
   - &teardown
     task: teardown
     file: pipelines/shared/tasks/teardown.yml
+    image: bosh-integration-registry-image
 
 jobs:
   - name: test-stemcell-ubuntu-xenial
@@ -83,6 +90,7 @@ jobs:
         - {get: syslog-release,              trigger: false}
         - {get: os-conf-release,             trigger: false}
         - {get: bosh-linux-stemcell-builder, trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - put: environment
         params:
           env_name: aws-test-stemcell-ubuntu-xenial
@@ -178,6 +186,7 @@ jobs:
         - {get: bosh-cli,        trigger: false}
         - {get: bats,            trigger: false}
         - {get: bosh-deployment, trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
         - get: ubuntu-xenial-stemcell
         - get: stemcell
           resource: centos-7-stemcell
@@ -285,6 +294,7 @@ jobs:
         - {get: old-bosh-release,        trigger: false}
         - {get: old-cpi-release,         trigger: false}
         - {get: bosh-deployment,         trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
         - get: new-stemcell
           resource: ubuntu-xenial-stemcell
           trigger: true
@@ -329,6 +339,7 @@ jobs:
             stemcell: new-stemcell
         - task: test-upgrade
           file: pipelines/shared/tasks/test-upgrade.yml
+          image: bosh-integration-registry-image
           input_mapping:
             stemcell: new-stemcell
             old-director-state:  director-state
@@ -355,8 +366,10 @@ jobs:
         - {get: cpi-release,  trigger: true, passed: [bats-centos-7, end2end-us]}
         - {get: stemcell,     trigger: true, passed: [bats-centos-7, end2end-us, test-upgrade], resource: centos-7-stemcell}
         - {get: pipelines,    trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
+        image: bosh-integration-registry-image
         params:
           CPI_RELEASE_NAME: bosh-aws-cpi
           STEMCELL_NAME:    bosh-aws-xen-hvm-centos-7-go_agent
@@ -370,8 +383,10 @@ jobs:
         - {get: cpi-release,  trigger: true, passed: [bats-ubuntu-xenial, end2end-us]}
         - {get: stemcell,     trigger: true, passed: [bats-ubuntu-xenial, end2end-us, test-upgrade, test-stemcell-ubuntu-xenial], resource: ubuntu-xenial-stemcell}
         - {get: pipelines,    trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
+        image: bosh-integration-registry-image
         params:
           CPI_RELEASE_NAME: bosh-aws-cpi
           STEMCELL_NAME:    bosh-aws-xen-hvm-ubuntu-xenial-go_agent
@@ -379,7 +394,7 @@ jobs:
 
 resource_types:
   - name: terraform_type
-    type: docker-image
+    type: registry-image
     source:
       repository: ljfranklin/terraform-resource
 
@@ -489,3 +504,10 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry/os-conf-release
+  - name: bosh-integration-registry-image
+    type: registry-image
+    source:
+      repository: ghcr.io/cloudfoundry/bosh/integration
+      tag: main
+      username: ((github_read_write_packages.username))
+      password: ((github_read_write_packages.password))
