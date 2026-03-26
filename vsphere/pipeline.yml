@@ -15,6 +15,7 @@ shared:
     task: prepare-director
     tags: [vsphere-v6.5]
     file: pipelines/shared/tasks/prepare-director.yml
+    image: bosh-integration-registry-image
     params: &prepare-director-params
       INFRASTRUCTURE:     vsphere
       DIRECTOR_VARS_FILE: {{vsphere_director_vars_file}}
@@ -26,6 +27,7 @@ shared:
     task: prepare-director-ipv6
     tags: [vsphere-v6.5]
     file: pipelines/shared/tasks/prepare-director.yml
+    image: bosh-integration-registry-image
     params:
       INFRASTRUCTURE:     vsphere
       DIRECTOR_VARS_FILE: {{vsphere_director_vars_file}}
@@ -41,6 +43,7 @@ shared:
     task: deploy-director
     tags: [vsphere-v6.5]
     file: pipelines/shared/tasks/deploy-director.yml
+    image: bosh-integration-registry-image
     params:
       NETWORK_NAME: default
 
@@ -48,6 +51,7 @@ shared:
     task: run-bats
     tags: [vsphere-v6.5]
     file: pipelines/shared/tasks/run-bats.yml
+    image: bosh-integration-registry-image
     params: &run-bats-params
       INFRASTRUCTURE:     vsphere
       BAT_INFRASTRUCTURE: vsphere
@@ -57,6 +61,7 @@ shared:
     task: test-stemcell
     tags: [vsphere-v6.5]
     file: pipelines/shared/tasks/test-stemcell.yml
+    image: bosh-integration-registry-image
     params:
       BOSH_os_name: ubuntu-trusty
       package: ipv4director
@@ -65,6 +70,7 @@ shared:
     task: update-cloud-config
     tags: [vsphere-v6.5]
     file: pipelines/shared/tasks/update-cloud-config.yml
+    image: bosh-integration-registry-image
     params: &update-cloud-config-params
       INFRASTRUCTURE: vsphere
       DIRECTOR_VARS_FILE: {{vsphere_director_vars_file}}
@@ -73,6 +79,7 @@ shared:
     task: teardown
     tags: [vsphere-v6.5]
     file: pipelines/shared/tasks/teardown.yml
+    image: bosh-integration-registry-image
 
 jobs:
   - name: test-stemcell-ipv4
@@ -90,6 +97,7 @@ jobs:
         - {get: syslog-release,  tags: [vsphere-v6.5], trigger: false}
         - {get: os-conf-release, tags: [vsphere-v6.5], trigger: false}
         - {get: bosh-linux-stemcell-builder, tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - do:
         - {put: environment, tags: [vsphere-v6.5], params: {acquire: true}}
         - <<: *prepare-director
@@ -123,6 +131,7 @@ jobs:
         - {get: syslog-release,  tags: [vsphere-v6.5], trigger: false}
         - {get: os-conf-release, tags: [vsphere-v6.5], trigger: false}
         - {get: bosh-linux-stemcell-builder, tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - do:
         - {put: environment, tags: [vsphere-v6.5], params: {acquire: true}}
         - <<: *prepare-director-ipv6
@@ -153,6 +162,7 @@ jobs:
         - {get: bosh-cli,        tags: [vsphere-v6.5], trigger: false}
         - {get: bats,            tags: [vsphere-v6.5], trigger: false}
         - {get: bosh-deployment, tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - {put: environment, tags: [vsphere-v6.5], params: {acquire: true}}
       - <<: *prepare-director
       - do:
@@ -178,6 +188,7 @@ jobs:
         - {get: bosh-cli,        tags: [vsphere-v6.5], trigger: false}
         - {get: bats,            tags: [vsphere-v6.5], trigger: false}
         - {get: bosh-deployment, tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - {put: environment, tags: [vsphere-v6.5], params: {acquire: true}}
       - <<: *prepare-director
       - do:
@@ -206,6 +217,7 @@ jobs:
         - {get: old-bosh-release, tags: [vsphere-v6.5], trigger: false, version: {version: {{old_bosh_release_version}}}, resource: bosh-release}
         - {get: old-cpi-release,  tags: [vsphere-v6.5], trigger: false, version: {version: {{old_cpi_release_version}}},  resource: cpi-release}
         - {get: bosh-deployment,  tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - {put: environment, tags: [vsphere-v6.5], params: {acquire: true}}
       - <<: *prepare-director
         input_mapping:
@@ -227,6 +239,7 @@ jobs:
           - task: create-deployment
             tags: [vsphere-v6.5]
             file: pipelines/shared/tasks/create-deployment.yml
+            image: bosh-integration-registry-image
             input_mapping:
               stemcell:                  old-stemcell
             params:
@@ -237,6 +250,7 @@ jobs:
           - task: test-upgrade
             tags: [vsphere-v6.5]
             file: pipelines/shared/tasks/test-upgrade.yml
+            image: bosh-integration-registry-image
             input_mapping:
               old-director-state: director-state
               new-director-config: director-config
@@ -255,8 +269,10 @@ jobs:
         - {get: cpi-release,  tags: [vsphere-v6.5], trigger: true, passed: [bats-centos]}
         - {get: stemcell,     tags: [vsphere-v6.5], trigger: true, passed: [bats-centos, test-upgrade], resource: centos-stemcell}
         - {get: pipelines,    tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
+        image: bosh-integration-registry-image
         tags: [vsphere-v6.5]
         params:
           CPI_RELEASE_NAME: bosh-vsphere-cpi
@@ -271,8 +287,10 @@ jobs:
         - {get: cpi-release,  tags: [vsphere-v6.5], trigger: true, passed: [bats-ubuntu]}
         - {get: stemcell,     tags: [vsphere-v6.5], trigger: true, passed: [bats-ubuntu, test-upgrade, test-stemcell-ipv4, test-stemcell-ipv6], resource: ubuntu-stemcell}
         - {get: pipelines,    tags: [vsphere-v6.5], trigger: false}
+        - {get: bosh-integration-registry-image, trigger: false}
       - task: generate
         file: pipelines/shared/tasks/generate-receipt.yml
+        image: bosh-integration-registry-image
         tags: [vsphere-v6.5]
         params:
           CPI_RELEASE_NAME: bosh-vsphere-cpi
@@ -356,3 +374,10 @@ resources:
     type: bosh-io-release
     source:
       repository: cloudfoundry/os-conf-release
+  - name: bosh-integration-registry-image
+    type: registry-image
+    source:
+      repository: ghcr.io/cloudfoundry/bosh/integration
+      tag: main
+      username: ((github_read_write_packages.username))
+      password: ((github_read_write_packages.password))
