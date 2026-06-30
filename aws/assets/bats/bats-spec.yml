@@ -10,7 +10,7 @@ properties:
   stemcell:
     name: ((stemcell_name))
     version: latest
-  instance_type: m6id.large
+  instance_type: ((instance_type))
   instances: 1
   availability_zone: ((az))
   key_name: ((default_key_name))
