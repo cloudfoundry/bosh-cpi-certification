@@ -325,7 +325,6 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      branch: master
   - name: centos-stemcell
     type: bosh-io-stemcell
     source:
