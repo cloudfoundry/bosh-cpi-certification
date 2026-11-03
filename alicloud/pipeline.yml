@@ -237,7 +237,6 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-deployment
-      branch: master
   - name: cpi-release
     type: github-release
     source:
