@@ -408,14 +408,13 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry-incubator/bosh-aws-cpi-release.git
-      branch: master
       paths:
         - ci/**
   - name: pipelines
     type: git
     source:
       uri: https://github.com/cloudfoundry-incubator/bosh-cpi-certification
-      branch: master
+      branch: main
   - name: bosh-deployment
     type: git
     source:
